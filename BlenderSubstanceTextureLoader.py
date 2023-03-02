@@ -2,6 +2,7 @@ import bpy
 import os
 
 # Generated with ChatGPT by BlackBladeDesign
+# Creates a fresh node tree on the selected material and loads Color, ORM, and normalmap textures from the Parent Directories child folder named /Textures
 
 # Get the current active node tree
 node_tree = bpy.context.active_object.active_material.node_tree
