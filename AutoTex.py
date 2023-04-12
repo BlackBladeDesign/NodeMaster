@@ -5,11 +5,11 @@ from bpy.props import (EnumProperty, StringProperty, BoolProperty)
 from bpy.types import (Panel,Operator,AddonPreferences,PropertyGroup)
 
 bl_info = {
-    "name": "AutoTex",
-    "description": "Auto loads ORM, Normal map, and basecolor textures and builds a node tree, or load from a specified path",
+    "name": "NodeMaster",
+    "description": "Streamlines texture loading and node creation",
     "author": "BlackBladeDesign",
     "version": (1, 0),
-    "blender": (2, 80, 0),
+    "blender": (3, 5, 0),
     "location": "Shader Editor > Options Panel > AutoTex",
     "category": "Shader"}
 
