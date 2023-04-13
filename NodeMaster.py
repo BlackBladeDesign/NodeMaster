@@ -6,11 +6,11 @@ from bpy.types import (Panel,Operator,AddonPreferences,PropertyGroup)
 
 bl_info = {
     "name": "NodeMaster",
-    "description": "Streamlines texture loading and node creation",
+    "description": "Streamlines and automates texture loading and node creation",
     "author": "BlackBladeDesign",
     "version": (1, 0),
     "blender": (3, 5, 0),
-    "location": "Shader Editor > Options Panel > AutoTex",
+    "location": "Shader Editor > Options Panel > NodeMaster",
     "category": "Shader"}
 
 class AutoTexProperties(bpy.types.PropertyGroup):
@@ -82,11 +82,11 @@ class AutoTexProperties(bpy.types.PropertyGroup):
 
 class AutoTexPanel(bpy.types.Panel):
     """Creates a new tab in the shader editor options panel"""
-    bl_label = "AutoTex"
+    bl_label = "NodeMaster"
     bl_idname = "NODE_PT_autotex"
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
-    bl_category = "AutoTex"
+    bl_category = "NodeMaster"
 
     def draw(self, context):
         layout = self.layout
