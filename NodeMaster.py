@@ -8,7 +8,7 @@ bl_info = {
     "name": "NodeMaster",
     "description": "Streamlines and automates texture loading and node creation",
     "author": "BlackBladeDesign",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (3, 5, 0),
     "location": "Shader Editor > Options Panel > NodeMaster",
     "category": "Shader"}
@@ -151,11 +151,16 @@ def setNodes(textures_dir, properties):
                 nTreeSetup(node_tree, textures_dir, mat.name, properties)
     else:
         # Get the current active material
-        mat = bpy.context.active_object.active_material
-        node_tree = mat.node_tree
-        material_name = mat.name
-        nTreeSetup(node_tree, textures_dir, material_name, properties)
- 
+        if bpy.context.active_object.active_material == None:
+            message = "No Material Selected".format
+            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title="Error", icon='ERROR')
+        else:
+            mat = bpy.context.active_object.active_material
+            node_tree = mat.node_tree
+            material_name = mat.name
+            nTreeSetup(node_tree, textures_dir, material_name, properties)
+
+            
 def nTreeSetup(node_tree, textures_dir, material_name, properties):
     file_type =properties.image_file_type
     node_structure = properties.node_structure
