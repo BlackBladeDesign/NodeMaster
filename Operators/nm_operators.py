@@ -59,15 +59,15 @@ def loadImageTexture(newPath, newNode, colorSpace):
          newNode.image = bpy.data.images.load(newPath)
          newNode.image.colorspace_settings.name = colorSpace
      else:
-         message = "Missing image file for material: {}".format(newPath)
+         message = "Missing Textures: {}".format(newPath)
          bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title="Error", icon='ERROR')
           
 def setNodes(textures_dir, properties):    
     apply_to = properties.apply_to
 
-
     if apply_to == "ALL_VISIBLE":
         # Apply to all visible materials
+        materials_found = False
         for obj in bpy.context.scene.objects:
             if not obj.visible_get():
                 continue
@@ -75,6 +75,10 @@ def setNodes(textures_dir, properties):
                 mat = material_slot.material
                 node_tree = mat.node_tree
                 nTreeSetup(node_tree, textures_dir, mat.name, properties)
+                materials_found = True
+        if not materials_found:
+            message = "No visible materials found".format
+            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title="Error", icon='ERROR')
     elif apply_to == "ALL_ATTACHED":
         # Apply to all materials attached to the active object
         obj = bpy.context.active_object
@@ -83,13 +87,16 @@ def setNodes(textures_dir, properties):
                 mat = material_slot.material
                 node_tree = mat.node_tree
                 nTreeSetup(node_tree, textures_dir, mat.name, properties)
+        else:
+            message = "No active object selected".format
+            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title="Error", icon='ERROR')
     else:
         # Get the current active material
-        if bpy.context.active_object.active_material == None:
-            message = "No Material Selected".format
+        mat = bpy.context.active_object.active_material
+        if mat is None:
+            message = "No active material selected".format
             bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title="Error", icon='ERROR')
         else:
-            mat = bpy.context.active_object.active_material
             node_tree = mat.node_tree
             material_name = mat.name
             nTreeSetup(node_tree, textures_dir, material_name, properties)
