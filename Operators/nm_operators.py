@@ -65,9 +65,9 @@ def loadImageTexture(newPath, newNode, colorSpace):
 def setNodes(textures_dir, properties):    
     apply_to = properties.apply_to
 
+
     if apply_to == "ALL_VISIBLE":
         # Apply to all visible materials
-        materials_found = False
         for obj in bpy.context.scene.objects:
             if not obj.visible_get():
                 continue
@@ -75,10 +75,6 @@ def setNodes(textures_dir, properties):
                 mat = material_slot.material
                 node_tree = mat.node_tree
                 nTreeSetup(node_tree, textures_dir, mat.name, properties)
-                materials_found = True
-        if not materials_found:
-            message = "No Materials Found on Visible Objects".format
-            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message()), title="Error", icon='ERROR')
     elif apply_to == "ALL_ATTACHED":
         # Apply to all materials attached to the active object
         obj = bpy.context.active_object
@@ -87,19 +83,18 @@ def setNodes(textures_dir, properties):
                 mat = material_slot.material
                 node_tree = mat.node_tree
                 nTreeSetup(node_tree, textures_dir, mat.name, properties)
-        else:
-            message = "No Materials Attatched".format
-            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message()), title="Error", icon='ERROR')
+    else:
         # Get the current active material
-        mat = bpy.context.active_object.active_material
-        if mat is None:
+        if bpy.context.active_object.active_material == None:
             message = "No Material Selected".format
             bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message()), title="Error", icon='ERROR')
         else:
+            mat = bpy.context.active_object.active_material
             node_tree = mat.node_tree
             material_name = mat.name
             nTreeSetup(node_tree, textures_dir, material_name, properties)
 
+      
             
 def nTreeSetup(node_tree, textures_dir, material_name, properties):
     file_type =properties.image_file_type
