@@ -77,8 +77,8 @@ def setNodes(textures_dir, properties):
                 nTreeSetup(node_tree, textures_dir, mat.name, properties)
                 materials_found = True
         if not materials_found:
-            message = "No objects attatched to visible objects!"
-            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message.format()), title="Error", icon='ERROR')
+            message = "No Materials Found on Visible Objects".format
+            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message()), title="Error", icon='ERROR')
     elif apply_to == "ALL_ATTACHED":
         # Apply to all materials attached to the active object
         obj = bpy.context.active_object
@@ -88,13 +88,13 @@ def setNodes(textures_dir, properties):
                 node_tree = mat.node_tree
                 nTreeSetup(node_tree, textures_dir, mat.name, properties)
         else:
-            message = "No active object selected!"
-            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message.format()), title="Error", icon='ERROR')
+            message = "No Materials Attatched".format
+            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message()), title="Error", icon='ERROR')
         # Get the current active material
         mat = bpy.context.active_object.active_material
         if mat is None:
-            message = "No active material selected!"
-            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message.format()), title="Error", icon='ERROR')
+            message = "No Material Selected".format
+            bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message()), title="Error", icon='ERROR')
         else:
             node_tree = mat.node_tree
             material_name = mat.name
