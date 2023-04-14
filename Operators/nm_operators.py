@@ -1,118 +1,52 @@
-import os
 import bpy
+import os
+from bpy.types import Operator
+from bpy.props import StringProperty
+from ..Props.nm_props import AutoTexProperties
 
-from bpy.props import (EnumProperty, StringProperty, BoolProperty)
-from bpy.types import (Panel,Operator,AddonPreferences,PropertyGroup)
-
-bl_info = {
-    "name": "NodeMaster",
-    "description": "Streamlines and automates texture loading and node creation",
-    "author": "BlackBladeDesign",
-    "version": (1, 1),
-    "blender": (3, 5, 0),
-    "location": "Shader Editor > Options Panel > NodeMaster",
-    "category": "Shader"}
-
-class AutoTexProperties(bpy.types.PropertyGroup):
+class AutoLoad(bpy.types.Operator):
+    """Auto-load textures for all nodes in the shader"""
+    bl_label = "Auto Load"
+    bl_idname = "node.autoload"
     
-    gltf_Node : bpy.props.BoolProperty(
-        name="Add glTF Node",
-        description="Create a GLB/GLTF Output node, connect AO or ORM red channel to it for Ambient Occlusion",
-        default=False
-    )
-    texCoord : bpy.props.BoolProperty(
-        name="Add Texture Coord",
-        description="Add Texture Coordinate node with mapping",
-        default=False
-    )
-    displacement : bpy.props.BoolProperty(
-        name="Add Displacement",
-        description="Add a Displacement node, connect to material output",
-        default=False
-    )
-    image_file_type: bpy.props.EnumProperty(
-        name="Image File Type",
-        description="Select the image file type",
-        items=(
-            (".jpg", "JPEG", ""),
-            (".png", "PNG", ""),
-            (".bmp", "BMP", ""),
-            (".tga", "Targa", "")
-        ),
-        default=".jpg"
-    )
+    def execute(self, context):
+        blend_dir = os.path.dirname(bpy.data.filepath)
+        parent_dir = os.path.dirname(blend_dir)
+        texturesFolder = os.path.join(parent_dir, 'Textures')
+        setPathFolder = bpy.context.scene.auto_tex_props.texturePath
+        
+        if setPathFolder and setPathFolder != "/Textures" and os.path.exists(bpy.path.abspath(setPathFolder)):
+           setNodes(bpy.context.scene.auto_tex_props.texturePath,bpy.context.scene.auto_tex_props)
+        else:
+            setNodes(texturesFolder,bpy.context.scene.auto_tex_props)
+        
+        return {'FINISHED'}
     
-    apply_to: bpy.props.EnumProperty(
-        name="Apply To",
-        description="Select the option to apply to",
-        items=(
-            ("SELECTED", "Selected", ""),
-            ("ALL_ATTACHED", "All Attached", ""),
-            ("ALL_VISIBLE", "All Visible", ""),
-        ),
-        default="SELECTED"
-    )
-    node_structure: bpy.props.EnumProperty(
-        name="Node Structure",
-        description="Select the node structure",
-        items=(
-            ("ORM_GLB", "ORM - GLB", ""),
-            ("BLENDER_BSDF", "Blender (BSDF)", ""),
-            #("PBR_METALLIC_ROUGHNESS", "PBR (Metallic Roughness)", ""),
-            #("DOCUMENT_CHANNELS_NORMAL_AO_NO_ALPHA", "Document Channels + Normal + AO (No Alpha)", ""),
-            #("DOCUMENT_CHANNELS_NORMAL_AO_WITH_ALPHA", "Document Channels + Normal + AO (With Alpha)", ""),
-        ),
-        default="ORM_GLB"
-    )
-        # Add two new StringProperty properties for texture names
-    normal_map: bpy.props.StringProperty(
-        name="Normal Map",
-        default="_Normal"
-    )
-    base_color: bpy.props.StringProperty(
-        name="Base Color",
-        default="_Color"
-    )
-    texturePath: bpy.props.StringProperty(
-        name="Path",
-        default = "/Textures"
-    )
+class LoadFromPath(bpy.types.Operator):
+    """Load textures from a specified path"""
+    bl_label = "Load From Path"
+    bl_idname = "node.loadfrompath"
+    filepath: bpy.props.StringProperty(subtype="FILE_PATH")
 
-        
+    def execute(self, context):
+        if not hasattr(self, 'first_time_run'):
+            self.first_time_run = True
+        else:
+            self.first_time_run = False
 
-class AutoTexPanel(bpy.types.Panel):
-    """Creates a new tab in the shader editor options panel"""
-    bl_label = "NodeMaster"
-    bl_idname = "NODE_PT_autotex"
-    bl_space_type = 'NODE_EDITOR'
-    bl_region_type = 'UI'
-    bl_category = "NodeMaster"
+        if self.first_time_run:
+            # Open the file browser to select a folder
+            context.window_manager.fileselect_add(self)
+            return {'RUNNING_MODAL'}
 
-    def draw(self, context):
-        layout = self.layout
-        row = layout.column()
-        row.label(text="Set your path, load textures & nodes")
-        row.operator("node.autoload", text="Load / Reload")
-        row.operator("node.loadfrompath", text="Set Texture Path")
-        row.label(text="")
-        row.prop(context.scene.auto_tex_props, "texturePath", text="Texture Path")
-        row.label(text="_______________________________________________________________")
-        row.label(text="Material Settings:")
-       
-        row.prop(context.scene.auto_tex_props, "gltf_Node", text="GLTF/GLB Output")
-        row.prop(context.scene.auto_tex_props, "displacement", text="Displacment")
-        row.label(text="")
-        row.prop(context.scene.auto_tex_props, "apply_to", text=" Apply To")
-        row.prop(context.scene.auto_tex_props, "image_file_type", text=" File Type")
-        row.prop(context.scene.auto_tex_props, "node_structure", text=" Node Structure") 
-        
+        else:
+            # Get the selected folder path
+            bpy.context.scene.auto_tex_props.texturePath = os.path.abspath(os.path.dirname(self.filepath))
+            textures_dir = bpy.context.scene.auto_tex_props.texturePath
+            setNodes(textures_dir, bpy.context.scene.auto_tex_props)
 
-        row.label(text="_______________________________________________________________")
-        row.label(text="Texture suffixes:")
-        row.prop(context.scene.auto_tex_props, "normal_map", text="- Normal Map")
-        row.prop(context.scene.auto_tex_props, "base_color", text="- Base Color")
-        
-        
+            return {'FINISHED'}
+    
 
 def connectNodes(node_tree, output_socket, input_socket):
     links = node_tree.links
@@ -274,68 +208,3 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
         node_tree.nodes['NormalMap'].location = (-300, -400)
         node_tree.nodes['Normal'].location = (0, -350)
  
-class ShaderAutoLoad(bpy.types.Operator):
-    """Auto-load textures for all nodes in the shader"""
-    bl_label = "Auto Load"
-    bl_idname = "node.autoload"
-    
-    def execute(self, context):
-        blend_dir = os.path.dirname(bpy.data.filepath)
-        parent_dir = os.path.dirname(blend_dir)
-        texturesFolder = os.path.join(parent_dir, 'Textures')
-        setPathFolder = bpy.context.scene.auto_tex_props.texturePath
-        
-        if setPathFolder and setPathFolder != "/Textures" and os.path.exists(bpy.path.abspath(setPathFolder)):
-           setNodes(bpy.context.scene.auto_tex_props.texturePath,bpy.context.scene.auto_tex_props)
-        else:
-            setNodes(texturesFolder,bpy.context.scene.auto_tex_props)
-        
-        return {'FINISHED'}
-    
-class ShaderLoadFromPath(bpy.types.Operator):
-    """Load textures from a specified path"""
-    bl_label = "Load From Path"
-    bl_idname = "node.loadfrompath"
-    filepath: bpy.props.StringProperty(subtype="FILE_PATH")
-
-    def execute(self, context):
-        if not hasattr(self, 'first_time_run'):
-            self.first_time_run = True
-        else:
-            self.first_time_run = False
-
-        if self.first_time_run:
-            # Open the file browser to select a folder
-            context.window_manager.fileselect_add(self)
-            return {'RUNNING_MODAL'}
-
-        else:
-            # Get the selected folder path
-            bpy.context.scene.auto_tex_props.texturePath = os.path.abspath(os.path.dirname(self.filepath))
-            textures_dir = bpy.context.scene.auto_tex_props.texturePath
-            setNodes(textures_dir, bpy.context.scene.auto_tex_props)
-
-            return {'FINISHED'}
-    
-
-
-def register():
-    bpy.utils.register_class(AutoTexProperties)
-    bpy.types.Scene.auto_tex_props = bpy.props.PointerProperty(type=AutoTexProperties)
-    bpy.utils.register_class(AutoTexPanel)
-    bpy.utils.register_class(ShaderAutoLoad)
-    bpy.utils.register_class(ShaderLoadFromPath)
-    bpy.types.Scene.textures_dir = bpy.props.StringProperty(
-        name="Textures Directory",
-        subtype='DIR_PATH',
-        default='')
-
-def unregister():
-    bpy.utils.unregister_class(AutoTexProperties)
-    del bpy.types.Scene.auto_tex_props
-    bpy.utils.unregister_class(AutoTexPanel)
-    bpy.utils.unregister_class(ShaderAutoLoad)
-    bpy.utils.unregister_class(ShaderLoadFromPath)
-
-if __name__ == "__main__":
-    register()
