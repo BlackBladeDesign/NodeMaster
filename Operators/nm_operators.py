@@ -130,8 +130,8 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
        gltf_node.node_tree = gltf_settings  
     
     # Create nodes
-    principled_node = createNode(node_tree, 'ShaderNodeBsdfPrincipled')
-    material_output_node = createNode(node_tree, 'ShaderNodeOutputMaterial')
+    principled_node = createNode(node_tree, 'ShaderNodeBsdfPrincipled', 'Principled BSDF')
+    material_output_node = createNode(node_tree, 'ShaderNodeOutputMaterial','Material Output')
     principled_node.name = 'Principled BSDF'
     principled_node.inputs['Base Color'].default_value = (1.0, 1.0, 1.0, 1.0)
     principled_node.location = (200, 200)
