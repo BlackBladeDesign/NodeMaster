@@ -78,8 +78,9 @@ def setNodes(textures_dir, properties):
                 nTreeSetup(node_tree, textures_dir, mat.name, properties)
     elif apply_to == "ALL_ATTACHED":
         # Apply to all materials attached to the active object
+
         obj = bpy.context.active_object
-        if obj:
+        if obj.active_material != None:
             for material_slot in obj.material_slots:
                 mat = material_slot.material
                 node_tree = mat.node_tree
@@ -143,7 +144,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
         # Create Nodes for ORM GLB
         orm_node = createNode(node_tree, 'ShaderNodeTexImage','ORM')
         sep_color_node = createNode(node_tree, 'ShaderNodeSeparateColor','Separate Color')
-        norm_node = createNode(node_tree, 'ShaderNodeNormalMap')
+        norm_node = createNode(node_tree, 'ShadearNodeNormalMap')
         norm_image_node = createNode(node_tree, 'ShaderNodeTexImage','NormalMap')
         basecolor_node = createNode(node_tree, 'ShaderNodeTexImage','Color')
 
