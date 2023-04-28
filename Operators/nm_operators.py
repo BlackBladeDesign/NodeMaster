@@ -130,6 +130,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
        # Add the "glTF Settings" node to the node tree
        gltf_node = node_tree.nodes.new('ShaderNodeGroup')
        gltf_node.node_tree = gltf_settings  
+       gltf_node.name = gltf_settings.name
        
     # Create nodes
     principled_node = createNewNode(node_tree, 'ShaderNodeBsdfPrincipled', 'Principled BSDF')
