@@ -96,7 +96,7 @@ def setNodes(textures_dir, properties):
             node_tree = mat.node_tree
             material_name = mat.name
             nTreeSetup(node_tree, textures_dir, material_name, properties)
-def createNode(node_tree, node_type, node_name):
+def createNewNode(node_tree, node_type, node_name):
     # Create a new node of the specified type
     node = node_tree.nodes.new(node_type)
     node.name = node_name
@@ -115,7 +115,6 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
         
     gltf_settings = None
     if properties.gltf_Node:
-       
        for node in bpy.data.node_groups:
             if node.name == "glTF Material Output":
                 gltf_settings = node
@@ -131,10 +130,10 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
        # Add the "glTF Settings" node to the node tree
        gltf_node = node_tree.nodes.new('ShaderNodeGroup')
        gltf_node.node_tree = gltf_settings  
-    
+       
     # Create nodes
-    principled_node = createNode(node_tree, 'ShaderNodeBsdfPrincipled', 'Principled BSDF')
-    material_output_node = createNode(node_tree, 'ShaderNodeOutputMaterial','Material Output')
+    principled_node = createNewNode(node_tree, 'ShaderNodeBsdfPrincipled', 'Principled BSDF')
+    material_output_node = createNewNode(node_tree, 'ShaderNodeOutputMaterial', 'Material Output')
 
     principled_node.inputs['Base Color'].default_value = (1.0, 1.0, 1.0, 1.0)
     principled_node.location = (200, 200)
@@ -145,11 +144,11 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
     if node_structure == "ORM_GLB":
         # Find the "glTF Settings" node
         # Create Nodes for ORM GLB
-        orm_node = createNode(node_tree, 'ShaderNodeTexImage','ORM')
-        sep_color_node = createNode(node_tree, 'ShaderNodeSeparateColor','Separate Color')
-        norm_node = createNode(node_tree, 'ShadearNodeNormalMap')
-        norm_image_node = createNode(node_tree, 'ShaderNodeTexImage','NormalMap')
-        basecolor_node = createNode(node_tree, 'ShaderNodeTexImage','Color')
+        orm_node = createNewNode(node_tree, 'ShaderNodeTexImage','ORM')
+        sep_color_node = createNewNode(node_tree, 'ShaderNodeSeparateColor','Separate Color')
+        norm_node = createNewNode(node_tree, 'ShadearNodeNormalMap')
+        norm_image_node = createNewNode(node_tree, 'ShaderNodeTexImage','NormalMap')
+        basecolor_node = createNewNode(node_tree, 'ShaderNodeTexImage','Color')
 
         # Set spacing
         node_tree.nodes['ORM'].location = (-400, -100)
@@ -181,11 +180,11 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
         roughness_file_path = os.path.join(textures_dir, material_name + '_Roughness' + file_type)
 
         # Create image texture nodes
-        normal_node = createNode(node_tree, 'ShaderNodeTexImage','NormalMap')
-        normal_map_node = createNode(node_tree, 'ShaderNodeNormalMap','Normal')
-        basecolor_node = createNode(node_tree, 'ShaderNodeTexImage','Color')
-        metallic_node = createNode(node_tree, 'ShaderNodeTexImage','Metallic')
-        roughness_node = createNode(node_tree, 'ShaderNodeTexImage','Roughness')
+        normal_node = createNewNode(node_tree, 'ShaderNodeTexImage','NormalMap')
+        normal_map_node = createNewNode(node_tree, 'ShaderNodeNormalMap','Normal')
+        basecolor_node = createNewNode(node_tree, 'ShaderNodeTexImage','Color')
+        metallic_node = createNewNode(node_tree, 'ShaderNodeTexImage','Metallic')
+        roughness_node = createNewNode(node_tree, 'ShaderNodeTexImage','Roughness')
         #load textures
         loadImageTexture(norm_file_path, normal_node, 'Non-Color')
         loadImageTexture(metallic_file_path, metallic_node, 'Non-Color')        
