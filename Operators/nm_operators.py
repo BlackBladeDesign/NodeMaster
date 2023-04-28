@@ -80,6 +80,7 @@ def setNodes(textures_dir, properties):
         # Apply to all materials attached to the active object
 
         obj = bpy.context.active_object
+        
         if obj.active_material != None:
             for material_slot in obj.material_slots:
                 mat = material_slot.material
@@ -106,7 +107,9 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
     node_structure = properties.node_structure
     nm_Suffix = properties.normal_map if properties.normal_map != "" else "_Normal"
     col_Suffix = properties.base_color if properties.base_color != "" else "_Color"
-    
+    if node_tree == None:
+        return
+
     for node in node_tree.nodes:
         node_tree.nodes.remove(node)
         
@@ -132,7 +135,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
     # Create nodes
     principled_node = createNode(node_tree, 'ShaderNodeBsdfPrincipled', 'Principled BSDF')
     material_output_node = createNode(node_tree, 'ShaderNodeOutputMaterial','Material Output')
-    principled_node.name = 'Principled BSDF'
+
     principled_node.inputs['Base Color'].default_value = (1.0, 1.0, 1.0, 1.0)
     principled_node.location = (200, 200)
     material_output_node.location = (600, 0)
