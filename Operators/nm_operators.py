@@ -6,7 +6,6 @@ from ..Props.nm_props import AutoTexProperties
 # Without a path set, will load from the .blend files parent folder, and then /textures. Eg if .blend exists in /3D Assets/Blend, it'll search in 3D Assets/Textures/.
 # Otherwise it will just reload from the path specified.
 class AutoLoad(Operator):
-    """Auto-load textures for all nodes in the shader"""
     bl_label = "Auto Load"
     bl_idname = "node.autoload"
     
@@ -17,14 +16,13 @@ class AutoLoad(Operator):
         setPathFolder = bpy.context.scene.auto_tex_props.texturePath
         
         if setPathFolder and setPathFolder != "/Textures" and os.path.exists(bpy.path.abspath(setPathFolder)):
-           applyMaterial(bpy.context.scene.auto_tex_props.texturePath,bpy.context.scene.auto_tex_props)
+            applyMaterial(bpy.context.scene.auto_tex_props.texturePath, bpy.context.scene.auto_tex_props)
         else:
-           applyMaterial(texturesFolder,bpy.context.scene.auto_tex_props)
-        
+            applyMaterial(texturesFolder, bpy.context.scene.auto_tex_props)
+
         return {'FINISHED'}
 #Sets the path to the texture folder and runs automatically to find all the applicable textures.
 class LoadFromPath(Operator):
-    """Load textures from a specified path"""
     bl_label = "Load From Path"
     bl_idname = "node.loadfrompath"
     filepath: bpy.props.StringProperty(subtype="FILE_PATH")
@@ -49,20 +47,7 @@ class LoadFromPath(Operator):
             return {'FINISHED'}
     
 
-def connectNodes(node_tree, output_socket, input_socket):
-    links = node_tree.links
-    link = links.new(output_socket, input_socket)
-    return link
-    
-def loadImageTexture(newPath, newNode, colorSpace):
-     
-     if os.path.exists(newPath):
-         newNode.image = bpy.data.images.load(newPath)
-         newNode.image.colorspace_settings.name = colorSpace
-     else:
-         message = "Missing Textures: {}".format(newPath)
-         bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title="Error", icon='ERROR')
-          
+       
 def applyMaterial(textures_dir, properties):    
     apply_to = properties.apply_to
 
@@ -94,12 +79,7 @@ def applyMaterial(textures_dir, properties):
             node_tree = mat.node_tree
             material_name = mat.name
             nTreeSetup(node_tree, textures_dir, material_name, properties)
-
-def createNode(nTree, nType, nName):
-    # Create a new node of the specified type
-    node = nTree.nodes.new(nType)
-    node.name = nName
-    return node    
+ 
 #Sets up the node tree based on the structure selected in properties.         
 def nTreeSetup(node_tree, textures_dir, material_name, properties):
    
@@ -135,44 +115,48 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
     principled_node = createNode(node_tree, 'ShaderNodeBsdfPrincipled', 'Principled BSDF')
     material_output_node = createNode(node_tree, 'ShaderNodeOutputMaterial', 'Material Output')
     connectNodes(node_tree, principled_node.outputs[0], material_output_node.inputs[0])
-
     principled_node.inputs['Base Color'].default_value = (1.0, 1.0, 1.0, 1.0)
     principled_node.location = (200, 200)
     material_output_node.location = (600, 0)
-    
-    
-    
-    
+
     if node_structure == "BLENDER_BSDF":
         
-        norm_file_path = os.path.join(textures_dir, material_name + nm_Suffix + file_type)
-        basecolor_file_path = os.path.join(textures_dir, material_name + col_Suffix + file_type)
-        metallic_file_path = os.path.join(textures_dir, material_name + '_Metallic' + file_type)
-        roughness_file_path = os.path.join(textures_dir, material_name + '_Roughness' + file_type)
-
         # Create image texture nodes
         normal_node = createNode(node_tree, 'ShaderNodeTexImage','NormalMap')
         normal_map_node = createNode(node_tree, 'ShaderNodeNormalMap','Normal')
         basecolor_node = createNode(node_tree, 'ShaderNodeTexImage','Color')
         metallic_node = createNode(node_tree, 'ShaderNodeTexImage','Metallic')
         roughness_node = createNode(node_tree, 'ShaderNodeTexImage','Roughness')
-        #load textures
-        loadImageTexture(norm_file_path, normal_node, 'Non-Color')
-        loadImageTexture(metallic_file_path, metallic_node, 'Non-Color')        
-        loadImageTexture(roughness_file_path, roughness_node, 'Non-Color')
-        loadImageTexture(basecolor_file_path, basecolor_node, 'sRGB')
+
         #connect Nodes
         connectNodes(node_tree, basecolor_node.outputs['Color'], principled_node.inputs['Base Color'])
         connectNodes(node_tree, metallic_node.outputs['Color'], principled_node.inputs['Metallic'])
         connectNodes(node_tree, roughness_node.outputs['Color'], principled_node.inputs['Roughness'])
         connectNodes(node_tree, normal_map_node.outputs['Normal'], principled_node.inputs['Normal'])
         connectNodes(node_tree, normal_node.outputs['Color'], normal_map_node.inputs['Color'])
-
+        
+        #position Nodes
         node_tree.nodes['Metallic'].location = (-400, -100)
         node_tree.nodes['Roughness'].location = (-100, -100)
         node_tree.nodes['Color'].location = (-400, 200)
         node_tree.nodes['NormalMap'].location = (-300, -400)
         node_tree.nodes['Normal'].location = (0, -350)
+
+        #load textures
+        norm_file_path = os.path.join(textures_dir, material_name + nm_Suffix + file_type)
+        basecolor_file_path = os.path.join(textures_dir, material_name + col_Suffix + file_type)
+        metallic_file_path = os.path.join(textures_dir, material_name + '_Metallic' + file_type)
+        roughness_file_path = os.path.join(textures_dir, material_name + '_Roughness' + file_type)
+        loadImageTexture(norm_file_path, normal_node, 'Non-Color')
+        loadImageTexture(metallic_file_path, metallic_node, 'Non-Color')        
+        loadImageTexture(roughness_file_path, roughness_node, 'Non-Color')
+        loadImageTexture(basecolor_file_path, basecolor_node, 'sRGB')
+
+        if gltf_settings:
+            ao_node = createNode(node_tree, 'ShaderNodeTexImage','AO')
+            connectNodes(node_tree, ao_node.outputs['Color'], gltf_node.inputs[0])
+            node_tree.nodes['AO'].location = (-800, 0)
+            gltf_node.location = (0,50)
     
     if node_structure == "ORM_GLB":
        
@@ -180,29 +164,48 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
         orm_node = createNode(node_tree, 'ShaderNodeTexImage','ORM')
         sep_color_node = createNode(node_tree, 'ShaderNodeSeparateColor','Separate Color')
         normal_node = createNode(node_tree, 'ShaderNodeTexImage','NormalMap')
-        normal_map_node = createNode(node_tree, 'ShaderNodeNormalMap','Normal')
+        normal_map_node = node_tree.nodes.new('ShaderNodeNormalMap')
         basecolor_node = createNode(node_tree, 'ShaderNodeTexImage','Color')
-
-        # Set spacing
-        node_tree.nodes['ORM'].location = (-400, -100)
-        node_tree.nodes['Separate Color'].location = (-100, -100)
-        node_tree.nodes['Color'].location = (-400, 200)
-        node_tree.nodes['NormalMap'].location = (-300, -400)
-        node_tree.nodes['Normal Map'].location = (0, -350)
-        principled_node.location = (200, 200)
-        material_output_node.location = (600, 0)
         # Connect Nodes
-        if gltf_settings != None:
-           connectNodes(node_tree, sep_color_node.outputs[0], gltf_node.inputs[0])
         connectNodes(node_tree, basecolor_node.outputs[0], principled_node.inputs['Base Color'])
         connectNodes(node_tree, normal_map_node.outputs['Normal'], principled_node.inputs['Normal'])
         connectNodes(node_tree, normal_node.outputs['Color'], normal_map_node.inputs['Color'])
         connectNodes(node_tree, orm_node.outputs[0], sep_color_node.inputs[0])
         connectNodes(node_tree, sep_color_node.outputs[2], principled_node.inputs['Metallic'])
         connectNodes(node_tree, sep_color_node.outputs[1], principled_node.inputs['Roughness'])
+        if gltf_settings:
+           connectNodes(node_tree, sep_color_node.outputs[0], gltf_node.inputs[0])
 
+        # Set spacing
+        orm_node.location = (-400, -100)
+        sep_color_node.location = (-100, -100)
+        basecolor_node.location = (-400, 200)
+        normal_node.location = (-300, -400)
+        normal_map_node.location = (0, -350)
+
+        #Load images
         loadImageTexture(os.path.join(textures_dir, material_name + '_ORM' + file_type),orm_node, 'Non-Color')
         loadImageTexture(os.path.join(textures_dir, material_name + nm_Suffix + file_type),normal_node, 'Non-Color')
-        loadImageTexture(os.path.join(textures_dir, material_name + col_Suffix + file_type), basecolor_node, 'sRGB')   
-         
+        loadImageTexture(os.path.join(textures_dir, material_name + col_Suffix + file_type), basecolor_node, 'sRGB')
+
  
+def createNode(node_tree, node_type, node_name):
+    # Create a new node of the specified type
+    newnode = node_tree.nodes.new(node_type)
+    newnode.name = node_name
+    return newnode        
+ 
+def loadImageTexture(newPath, newNode, colorSpace):
+     
+     if os.path.exists(newPath):
+         newNode.image = bpy.data.images.load(newPath)
+         newNode.image.colorspace_settings.name = colorSpace
+     else:
+         message = "Missing Textures: {}".format(newPath)
+         bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title="Error", icon='ERROR')
+def connectNodes(node_tree, output_socket, input_socket):
+    links = node_tree.links
+    link = links.new(output_socket, input_socket)
+    return link
+    
+  
