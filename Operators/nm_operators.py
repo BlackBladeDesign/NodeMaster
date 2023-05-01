@@ -70,15 +70,26 @@ def applyMaterial(textures_dir, properties):
                 node_tree = mat.node_tree
                 nTreeSetup(node_tree, textures_dir, mat.name, properties)
     else:
-        # Get the current active material
-        if bpy.context.active_object.active_material == None:
-            message = "No Material Selected".format
+# Get the active object
+        # Get all objects in the scene
+        all_objects = bpy.context.scene.objects
+
+        # Check if there are any objects in the scene
+        if len(all_objects) == 0:
+            message = "No Objects in scene".format
             bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message()), title="Error", icon='ERROR')
         else:
-            mat = bpy.context.active_object.active_material
-            node_tree = mat.node_tree
-            material_name = mat.name
-            nTreeSetup(node_tree, textures_dir, material_name, properties)
+            # Get the active object
+            obj = bpy.context.active_object
+            # Check if there is an active object and if it has an active material
+            if  obj == None or obj and obj.active_material == None:
+                message = "No Material or Object Selected".format
+                bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message()), title="Error", icon='ERROR')
+            else:
+                mat = bpy.context.active_object.active_material
+                node_tree = mat.node_tree
+                material_name = mat.name
+                nTreeSetup(node_tree, textures_dir, material_name, properties)
  
 #Sets up the node tree based on the structure selected in properties.         
 def nTreeSetup(node_tree, textures_dir, material_name, properties):
@@ -88,7 +99,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
     node_structure = properties.node_structure
     nm_Suffix = properties.normal_map if properties.normal_map != "" else "_Normal"
     col_Suffix = properties.base_color if properties.base_color != "" else "_Color"
-   
+    
     for node in node_tree.nodes:
         node_tree.nodes.remove(node)
 
@@ -120,7 +131,8 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
     material_output_node.location = (600, 0)
 
     if node_structure == "BLENDER_BSDF":
-        
+        met_Suffix = properties.metallic_texture if properties.metallic_texture != "" else "_Metallic"
+        roughness_Suffix = properties.roughness_texture if properties.roughness_texture != "" else "_Roughness"
         # Create image texture nodes
         normal_node = createNode(node_tree, 'ShaderNodeTexImage','NormalMap')
         normal_map_node = createNode(node_tree, 'ShaderNodeNormalMap','Normal')
@@ -145,8 +157,8 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
         #load textures
         norm_file_path = os.path.join(textures_dir, material_name + nm_Suffix + file_type)
         basecolor_file_path = os.path.join(textures_dir, material_name + col_Suffix + file_type)
-        metallic_file_path = os.path.join(textures_dir, material_name + '_Metallic' + file_type)
-        roughness_file_path = os.path.join(textures_dir, material_name + '_Roughness' + file_type)
+        metallic_file_path = os.path.join(textures_dir, material_name + met_Suffix + file_type)
+        roughness_file_path = os.path.join(textures_dir, material_name + roughness_Suffix + file_type)
         loadImageTexture(norm_file_path, normal_node, 'Non-Color')
         loadImageTexture(metallic_file_path, metallic_node, 'Non-Color')        
         loadImageTexture(roughness_file_path, roughness_node, 'Non-Color')
@@ -159,7 +171,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
             gltf_node.location = (0,50)
     
     if node_structure == "ORM_GLB":
-       
+        orm_Suffix = properties.orm_texture if properties.orm_texture != "" else "_ORM"
         # Create Nodes for ORM GLB
         orm_node = createNode(node_tree, 'ShaderNodeTexImage','ORM')
         sep_color_node = createNode(node_tree, 'ShaderNodeSeparateColor','Separate Color')
@@ -184,7 +196,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
         normal_map_node.location = (0, -350)
 
         #Load images
-        loadImageTexture(os.path.join(textures_dir, material_name + '_ORM' + file_type),orm_node, 'Non-Color')
+        loadImageTexture(os.path.join(textures_dir, material_name + orm_Suffix + file_type),orm_node, 'Non-Color')
         loadImageTexture(os.path.join(textures_dir, material_name + nm_Suffix + file_type),normal_node, 'Non-Color')
         loadImageTexture(os.path.join(textures_dir, material_name + col_Suffix + file_type), basecolor_node, 'sRGB')
 

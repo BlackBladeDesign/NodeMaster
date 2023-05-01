@@ -25,6 +25,7 @@ class AutoTexPanel(bpy.types.Panel):
        
         row.prop(context.scene.auto_tex_props, "gltf_Node", text="GLTF/GLB Output")
         row.prop(context.scene.auto_tex_props, "displacement", text="Displacment")
+        row.prop(context.scene.auto_tex_props, "texCoord", text="Tex Co-ord")
         row.label(text="")
         row.prop(context.scene.auto_tex_props, "apply_to", text=" Apply To")
         row.prop(context.scene.auto_tex_props, "image_file_type", text=" File Type")
@@ -35,5 +36,11 @@ class AutoTexPanel(bpy.types.Panel):
         row.label(text="Texture suffixes:")
         row.prop(context.scene.auto_tex_props, "normal_map", text="- Normal Map")
         row.prop(context.scene.auto_tex_props, "base_color", text="- Base Color")
+        if context.scene.auto_tex_props.node_structure == "ORM_GLB":
+            row.prop(context.scene.auto_tex_props, "orm_texture", text="- ORM")
+        if context.scene.auto_tex_props.node_structure == "BLENDER_BSDF":
+            row.prop(context.scene.auto_tex_props, "roughness_texture", text="- Roughness")
+            row.prop(context.scene.auto_tex_props, "metallic_texture", text="- Metallic")
+        
         
         

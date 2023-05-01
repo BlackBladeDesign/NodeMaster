@@ -63,6 +63,18 @@ class AutoTexProperties(bpy.types.PropertyGroup):
         name="Base Color",
         default="_Color"
     )
+    orm_texture: bpy.props.StringProperty(
+        name="ORM Texture",
+        default="_ORM"
+    )
+    roughness_texture: bpy.props.StringProperty(
+        name="Roughness",
+        default="_Roughness"
+    )
+    metallic_texture: bpy.props.StringProperty(
+        name="Metallic",
+        default="_Metallic"
+    )
     texturePath: bpy.props.StringProperty(
         name="Path",
         default = "/Textures"
