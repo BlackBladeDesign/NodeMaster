@@ -5,24 +5,29 @@ import os
 
 class AutoTexProperties(bpy.types.PropertyGroup):
     
+    loadTextures : bpy.props.BoolProperty(
+        name="Load Image Textures",
+        description="Enabled or disable to load image textures. Helpful for if you just want the node structure without images.",
+        default=True
+    )
     gltf_Node : bpy.props.BoolProperty(
         name="Add glTF Node",
-        description="Create a GLB/GLTF Output node, connect AO or ORM red channel to it for Ambient Occlusion",
+        description="Create a GLB/GLTF Output node, connect AO or ORM red channel to it for Ambient Occlusion.",
         default=False
     )
     texCoord : bpy.props.BoolProperty(
         name="Add Texture Coord",
-        description="Add Texture Coordinate node with mapping",
+        description="Add Texture Coordinate node with mapping.",
         default=False
     )
     displacement : bpy.props.BoolProperty(
         name="Add Displacement",
-        description="Add a Displacement node, connect to material output",
+        description="Add a Displacement node, connect to material output.",
         default=False
     )
     image_file_type: bpy.props.EnumProperty(
         name="Image File Type",
-        description="Select the image file type",
+        description="Select the image file type.",
         items=(
             (".jpg", "JPEG", ""),
             (".png", "PNG", ""),
@@ -34,7 +39,7 @@ class AutoTexProperties(bpy.types.PropertyGroup):
     
     apply_to: bpy.props.EnumProperty(
         name="Apply To",
-        description="Select the option to apply to",
+        description="Apply to the selected material, all materials attatched to the selected object, or all materials for all visible objects.",
         items=(
             ("SELECTED", "Selected", ""),
             ("ALL_ATTACHED", "All Attached", ""),
@@ -44,7 +49,7 @@ class AutoTexProperties(bpy.types.PropertyGroup):
     )
     node_structure: bpy.props.EnumProperty(
         name="Node Structure",
-        description="Select the node structure",
+        description="Select the node structure to create, read about each on the github page.",
         items=(
             ("ORM_GLB", "ORM - GLB", ""),
             ("BLENDER_BSDF", "Blender (BSDF)", ""),

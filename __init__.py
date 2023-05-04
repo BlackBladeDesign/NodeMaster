@@ -2,7 +2,7 @@ import bpy
 from bpy.props import PointerProperty
 from bpy.props import (EnumProperty, StringProperty, BoolProperty)
 from bpy.types import (Panel,Operator,AddonPreferences,PropertyGroup)
-from .Panel.nm_panel import AutoTexPanel
+from .Panel.nm_panel import AutoTexPanel, matSettingsPanel, texSuffixPanel, fileSettingsPanel, nodeStructurePanel
 from .Operators.nm_operators import AutoLoad, LoadFromPath
 from .Props.nm_props import AutoTexProperties
 
@@ -23,6 +23,12 @@ classes = [
     AutoTexPanel,
     AutoLoad,
     LoadFromPath,
+    nodeStructurePanel,
+    fileSettingsPanel,
+    matSettingsPanel,
+    texSuffixPanel
+    
+    
 ]
 
 
