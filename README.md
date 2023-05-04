@@ -1,5 +1,6 @@
 Streamline and automate texture and node creation in blender. 
 Once enabled, find the NodeMaster panel in the Shader Editor, under the options panel listed as a new tab.
+
 ![Nodemaster](https://user-images.githubusercontent.com/126746830/236106941-168c7fbd-fbbc-43ce-8d19-f44f1b198716.png)
 
 - Streamlined texture loading based on selected material's name.
