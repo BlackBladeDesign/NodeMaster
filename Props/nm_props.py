@@ -51,7 +51,7 @@ class AutoTexProperties(bpy.types.PropertyGroup):
         name="Node Structure",
         description="Select the node structure to create, read about each on the github page.",
         items=(
-            ("ORM_GLB", "ORM - GLB", ""),
+            ("ORM_GLB", "ORM - GLB", "ORM GLB (Custom)"),
             ("BLENDER_BSDF", "Blender (BSDF)", ""),
             #("PBR_METALLIC_ROUGHNESS", "PBR (Metallic Roughness)", ""),
             #("DOCUMENT_CHANNELS_NORMAL_AO_NO_ALPHA", "Document Channels + Normal + AO (No Alpha)", ""),
@@ -85,4 +85,3 @@ class AutoTexProperties(bpy.types.PropertyGroup):
         default = "/Textures"
     )
 
-        

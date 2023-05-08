@@ -7,6 +7,7 @@ from .Operators.nm_operators import AutoLoad, LoadFromPath
 from .Props.nm_props import AutoTexProperties
 
 
+
 bl_info = {
     "name": "NodeMaster",
     "description": "Streamlines and automates texture loading and node creation",

@@ -21,7 +21,8 @@ class AutoTexPanel(bpy.types.Panel):
         row.label(text="Set your path, load textures & nodes")
         row.operator("node.autoload", text="Load / Reload")
         row.operator("node.loadfrompath", text="Set Texture Path")
-       
+        row.operator("node.loadJSON", text="Load Node Tree (JSON)")
+        row.operator("node.exportJSON", text="Export Node Tree (JSON)")
 
 class nodeStructurePanel(bpy.types.Panel):
     bl_label = "Node Structure Settings"
