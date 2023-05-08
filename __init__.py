@@ -5,6 +5,7 @@ from bpy.types import (Panel,Operator,AddonPreferences,PropertyGroup)
 from .Panel.nm_panel import AutoTexPanel, matSettingsPanel, texSuffixPanel, fileSettingsPanel, nodeStructurePanel
 from .Operators.nm_operators import AutoLoad, LoadFromPath
 from .Props.nm_props import AutoTexProperties
+from .Operators.nm_nodeEXP import ImportNodes, ExportNodes
 
 
 
@@ -17,6 +18,7 @@ bl_info = {
     "location": "Shader Editor > Options Panel > NodeMaster",
     "category": "Shader"
 }
+  
 
 
 classes = [
@@ -24,6 +26,8 @@ classes = [
     AutoTexPanel,
     AutoLoad,
     LoadFromPath,
+    ImportNodes,
+    ExportNodes,
     nodeStructurePanel,
     fileSettingsPanel,
     matSettingsPanel,
