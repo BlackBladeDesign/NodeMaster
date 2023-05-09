@@ -2,7 +2,8 @@ import bpy
 import os
 from bpy.types import Operator
 from bpy.props import StringProperty
-from ..Props.nm_props import AutoTexProperties
+from ..Props.nm_props import NodeMasterProperties
+
 # Without a path set, will load/reload from the .blend files parent folder, and then /textures. Eg if .blend exists in /3D Assets/Blend, it'll search in 3D Assets/Textures/.
 # Otherwise it will just reload from the path specified.
 class AutoLoad(Operator):
@@ -13,12 +14,12 @@ class AutoLoad(Operator):
         blend_dir = os.path.dirname(bpy.data.filepath)
         parent_dir = os.path.dirname(blend_dir)
         texturesFolder = os.path.join(parent_dir, 'Textures')
-        setPathFolder = bpy.context.scene.auto_tex_props.texturePath
+        setPathFolder = bpy.context.scene.nm_props.texturePath
         
         if setPathFolder and setPathFolder != "/Textures" and os.path.exists(bpy.path.abspath(setPathFolder)):
-            applyMaterial(bpy.context.scene.auto_tex_props.texturePath, bpy.context.scene.auto_tex_props)
+            applyMaterial(bpy.context.scene.nm_props.texturePath, bpy.context.scene.nm_props)
         else:
-            applyMaterial(texturesFolder, bpy.context.scene.auto_tex_props)
+            applyMaterial(texturesFolder, bpy.context.scene.nm_props)
 
         return {'FINISHED'}
 #Sets the path to the texture folder and runs automatically to find all the applicable textures.
@@ -40,9 +41,9 @@ class LoadFromPath(Operator):
 
         else:
             # Get the selected folder path
-            bpy.context.scene.auto_tex_props.texturePath = os.path.abspath(os.path.dirname(self.filepath))
-            textures_dir = bpy.context.scene.auto_tex_props.texturePath
-            applyMaterial(textures_dir, bpy.context.scene.auto_tex_props)
+            bpy.context.scene.nm_props.texturePath = os.path.abspath(os.path.dirname(self.filepath))
+            textures_dir = bpy.context.scene.nm_props.texturePath
+            applyMaterial(textures_dir, bpy.context.scene.nm_props)
 
             return {'FINISHED'}
     
@@ -200,7 +201,7 @@ def createNode(node_tree, node_type, node_name, x, y):
         return new_node
 
 def loadImageTexture(texDir, material, suffix, filetype, colorSpace):
-     if bpy.context.scene.auto_tex_props.loadTextures:
+     if bpy.context.scene.nm_props.loadTextures:
         newPath = os.path.join(texDir, (material + suffix + filetype))
         if os.path.exists(newPath):
             image = bpy.data.images.load(newPath)
@@ -223,5 +224,20 @@ def connectNodes(node_tree, output_socket, input_socket):
     # Link does not exist, create a new one
     new_link = links.new(output_socket, input_socket)
     return new_link
-    
-  
+#add a custom property to objects or materials.   
+def addProperty (selection, customProperty, value, applyMat, applyOBJ):
+    # get the selected objects
+    selection = bpy.context.selected_objects
+
+    # loop through all selected objects
+    if applyMat:
+        for obj in selection:
+            # loop through all materials in the object
+            for mat_slot in obj.material_slots:
+                mat = mat_slot.material
+                # add a custom property named "refractionIOR" with a value of 1.4 to the material
+                mat["refractionIOR"] = 1.4
+    if applyOBJ: 
+            for obj in selection:
+                # add a custom property with the specified name and value to the object
+                obj[customProperty] = value

@@ -2,10 +2,11 @@ import bpy
 from bpy.props import PointerProperty
 from bpy.props import (EnumProperty, StringProperty, BoolProperty)
 from bpy.types import (Panel,Operator,AddonPreferences,PropertyGroup)
-from .Panel.nm_panel import AutoTexPanel, matSettingsPanel, texSuffixPanel, fileSettingsPanel, nodeStructurePanel
+from .Panel.nm_panel import NodeMasterPanel, matSettingsPanel, texSuffixPanel, fileSettingsPanel, nodeStructurePanel, nmToolsPanel
 from .Operators.nm_operators import AutoLoad, LoadFromPath
-from .Props.nm_props import AutoTexProperties
+from .Props.nm_props import NodeMasterProperties
 from .Operators.nm_nodeEXP import ImportNodes, ExportNodes
+from .Operators.nm_matCleanup import matCleanup, imgCleanup
 
 
 
@@ -22,8 +23,8 @@ bl_info = {
 
 
 classes = [
-    AutoTexProperties,
-    AutoTexPanel,
+    NodeMasterProperties,
+    NodeMasterPanel,
     AutoLoad,
     LoadFromPath,
     ImportNodes,
@@ -31,7 +32,10 @@ classes = [
     nodeStructurePanel,
     fileSettingsPanel,
     matSettingsPanel,
-    texSuffixPanel
+    texSuffixPanel,
+    nmToolsPanel,
+    matCleanup,
+    imgCleanup
     
     
 ]
@@ -41,11 +45,11 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
         
-    bpy.types.Scene.auto_tex_props = PointerProperty(type=AutoTexProperties)
+    bpy.types.Scene.nm_props = PointerProperty(type=NodeMasterProperties)
     
 
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
         
-    del bpy.types.Scene.auto_tex_props
+    del bpy.types.Scene.nm_props

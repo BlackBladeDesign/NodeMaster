@@ -3,7 +3,7 @@ from bpy.props import (EnumProperty, StringProperty, BoolProperty)
 from bpy.types import (PropertyGroup, Operator)
 import os
 
-class AutoTexProperties(bpy.types.PropertyGroup):
+class NodeMasterProperties(bpy.types.PropertyGroup):
     
     loadTextures : bpy.props.BoolProperty(
         name="Load Image Textures",
