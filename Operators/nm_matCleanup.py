@@ -61,8 +61,6 @@ class matCleanup(Operator):
         remove_all_duplicate_materials()
         return {'FINISHED'}
 
-import bpy
-
 class imgCleanup(Operator):
     bl_label = "Image Cleanup"
     bl_idname = "node.imgcleaner"

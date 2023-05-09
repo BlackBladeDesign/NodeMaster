@@ -1,8 +1,6 @@
 import bpy
 import os
 from bpy.types import Operator
-from bpy.props import StringProperty
-from ..Props.nm_props import NodeMasterProperties
 
 # Without a path set, will load/reload from the .blend files parent folder, and then /textures. Eg if .blend exists in /3D Assets/Blend, it'll search in 3D Assets/Textures/.
 # Otherwise it will just reload from the path specified.
@@ -150,6 +148,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
         metallic_node.image = loadImageTexture(textures_dir, material_name, met_Suffix, file_type, 'Non-Color')        
         roughness_node.image = loadImageTexture(textures_dir, material_name, roughness_Suffix, file_type, 'Non-Color')
         basecolor_node.image = loadImageTexture(textures_dir, material_name, col_Suffix, file_type, 'sRGB')
+        bpy.ops.node.imgcleaner()
 
         if gltf_settings:
             ao_node = createNode(node_tree, 'ShaderNodeTexImage','AO',-800,0)
@@ -178,6 +177,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
         orm_node.image = loadImageTexture(textures_dir, material_name, orm_Suffix, file_type, 'Non-Color')
         normal_map_node.image = loadImageTexture(textures_dir, material_name, nm_Suffix, file_type, 'Non-Color')
         basecolor_node.image = loadImageTexture(textures_dir, material_name, col_Suffix, file_type, 'sRGB')
+        bpy.ops.node.imgcleaner()
 
  
 def createNode(node_tree, node_type, node_name, x, y):
