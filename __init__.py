@@ -14,7 +14,7 @@ bl_info = {
     "name": "NodeMaster",
     "description": "Streamlines and automates texture loading and node creation",
     "author": "BlackBladeDesign",
-    "version": (1, 2),
+    "version": (1, 3),
     "blender": (3, 5, 0),
     "location": "Shader Editor > Options Panel > NodeMaster",
     "category": "Shader"
