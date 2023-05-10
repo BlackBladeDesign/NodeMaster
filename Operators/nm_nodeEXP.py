@@ -1,8 +1,9 @@
 import bpy
 import os
 import json
-from bpy.types import Operator
 from bpy.props import StringProperty
+from bpy.types import Operator
+
 
 class ImportNodes(Operator):
     bl_label = "Import Nodes"
@@ -32,7 +33,10 @@ class ImportNodes(Operator):
             for input_data in node_data.get("inputs", []):
                 input_socket = node.inputs.get(input_data["name"])
                 if input_socket:
-                    input_socket.default_value = input_data["default_value"]
+                    if input_socket.type == 'RGBA':
+                        input_socket.default_value = (input_data["default_value"][0], input_data["default_value"][1], input_data["default_value"][2], input_data["default_value"][3])
+                    else:
+                        input_socket.default_value = input_data["default_value"]
 
         # Loop through the links in the JSON data and create Blender links
         for link_data in data["links"]:
@@ -49,11 +53,11 @@ class ImportNodes(Operator):
         bpy.context.active_object.active_material = mat
 
         return {'FINISHED'}
-
+    
 class ExportNodes(Operator):
     bl_label = "Export Nodes"
     bl_idname = "node.exportjson"
-
+    filepath: bpy.props.StringProperty(subtype="FILE_PATH")
     def execute(self, context):
         # Get the active material and node tree
         mat = bpy.context.active_object.active_material
@@ -70,7 +74,14 @@ class ExportNodes(Operator):
             node_data = {"name": node.name, "type": node.bl_idname, "location": node.location.to_tuple()}
             input_data_list = []
             for input_socket in node.inputs:
-                input_data = {"name": input_socket.name, "default_value": input_socket.default_value}
+                if input_socket.type == 'SHADER':
+                    continue
+                input_data = {"name": input_socket.name}
+                if input_socket.default_value is not None:
+                    if isinstance(input_socket.default_value, bpy.types.bpy_prop_array):
+                        input_data["default_value"] = list(input_socket.default_value)
+                    else:
+                        input_data["default_value"] = input_socket.default_value
                 input_data_list.append(input_data)
             node_data["inputs"] = input_data_list
             data["nodes"].append(node_data)
@@ -78,7 +89,7 @@ class ExportNodes(Operator):
         # Loop through the links in the node tree and add their data to the dictionary
         for link in mat.node_tree.links:
             link_data = {"from_node": link.from_node.name, "from_output": link.from_socket.name,
-                         "to_node": link.to_node.name, "to_input": link.to_socket.name}
+                        "to_node": link.to_node.name, "to_input": link.to_socket.name}
             data["links"].append(link_data)
 
         # Save the data to the selected file as JSON
@@ -87,7 +98,3 @@ class ExportNodes(Operator):
 
         return {'FINISHED'}
 
-    def invoke(self, context, event):
-        # Open the file browser to select a folder and file name to save the JSON data to
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}
