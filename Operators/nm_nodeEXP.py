@@ -1,100 +1,105 @@
 import bpy
-import os
 import json
-from bpy.props import StringProperty
-from bpy.types import Operator
+from json import JSONEncoder
+from bpy_extras.io_utils import ExportHelper, ImportHelper
 
 
-class ImportNodes(Operator):
+class NodeEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, bpy.types.Node):
+            return obj.name
+        if isinstance(obj, bpy.types.NodeSocket):
+            return obj.identifier
+        if isinstance(obj, bpy.types.NodeLink):
+            return (obj.from_node.name, obj.from_socket.identifier,
+                    obj.to_node.name, obj.to_socket.identifier)
+        return super().default(obj)
+
+
+def export_node_tree(node_tree, file_path):
+    data = {'nodes': [], 'links': []}
+
+    for node in node_tree.nodes:
+        node_data = {
+            'name': node.name,
+            'type': type(node).__name__,
+            'location': (node.location.x, node.location.y),
+            'inputs': [(input.identifier, input.name, input.type)
+                       for input in node.inputs],
+            'outputs': [(output.identifier, output.name, output.type)
+                        for output in node.outputs]
+        }
+        if isinstance(node, bpy.types.ShaderNodeTexImage) and node.image is not None:
+            node_data['color_space'] = node.image.colorspace_settings.name
+        data['nodes'].append(node_data)
+
+    for link in node_tree.links:
+        data['links'].append((link.from_node, link.from_socket,
+                              link.to_node, link.to_socket))
+
+    with open(file_path, 'w', encoding='utf-8') as file:
+        json.dump(data, file, cls=NodeEncoder, ensure_ascii=False, indent=4)
+
+    return {'FINISHED'}
+
+def import_node_tree(file_path):
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+
+    selected_material = bpy.context.active_object.active_material
+    node_tree = selected_material.node_tree
+
+    node_dict = {}
+    for node_data in data['nodes']:
+        node_type = node_data['type']
+        node_location = node_data['location']
+        node = node_tree.nodes.new(node_type)
+        node.location = node_location
+
+        if node_type == 'ShaderNodeTexImage':
+            color_space = node_data.get('color_space')
+            if color_space:
+                node.image.colorspace_settings.name = color_space
+
+        node_dict[node_data['name']] = node
+
+    for link_data in data['links']:
+        from_node = node_dict[link_data[0]]
+        from_socket = from_node.outputs[link_data[1]]
+        to_node = node_dict[link_data[2]]
+        to_socket = to_node.inputs[link_data[3]]
+        node_tree.links.new(from_socket, to_socket)
+
+    return {'FINISHED'}
+
+
+class ImportNodes(bpy.types.Operator, ImportHelper):
     bl_label = "Import Nodes"
-    bl_idname = "node.loadjson"
-    filepath: bpy.props.StringProperty(subtype="FILE_PATH")
+    bl_idname = "node.importjson"
+    filename_ext = ".json"
+
+    filter_glob: bpy.props.StringProperty(
+        default="*.json",
+        options={'HIDDEN'},
+        maxlen=255,
+    )
 
     def execute(self, context):
-        # Open the file browser to select a file
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}
-
-        # Load the JSON data from the selected file
-        with open(self.filepath, 'r') as f:
-            data = json.load(f)
-
-        # Create a new material and node tree
-        mat = bpy.data.materials.new(name="My Material")
-        nodes = mat.node_tree.nodes
-
-        # Loop through the nodes in the JSON data and create Blender nodes
-        for node_data in data["nodes"]:
-            node = nodes.new(type=node_data["type"])
-            node.name = node_data["name"]
-            node.location = node_data["location"]
-
-            # Loop through the inputs for this node and set their default values
-            for input_data in node_data.get("inputs", []):
-                input_socket = node.inputs.get(input_data["name"])
-                if input_socket:
-                    if input_socket.type == 'RGBA':
-                        input_socket.default_value = (input_data["default_value"][0], input_data["default_value"][1], input_data["default_value"][2], input_data["default_value"][3])
-                    else:
-                        input_socket.default_value = input_data["default_value"]
-
-        # Loop through the links in the JSON data and create Blender links
-        for link_data in data["links"]:
-            from_node = nodes.get(link_data["from_node"])
-            to_node = nodes.get(link_data["to_node"])
-            if from_node and to_node:
-                from_socket = from_node.outputs.get(link_data["from_output"])
-                to_socket = to_node.inputs.get(link_data["to_input"])
-                if from_socket and to_socket:
-                    mat.node_tree.links.new(from_socket, to_socket)
-
-        # Set the active material to the new material
-        bpy.context.view_layer.objects.active = bpy.context.active_object
-        bpy.context.active_object.active_material = mat
-
+        file_path = self.filepath
+        import_node_tree(file_path)
         return {'FINISHED'}
-    
-class ExportNodes(Operator):
+class ExportNodes(bpy.types.Operator, ExportHelper):
     bl_label = "Export Nodes"
     bl_idname = "node.exportjson"
-    filepath: bpy.props.StringProperty(subtype="FILE_PATH")
+    filename_ext = ".json"
+    filter_glob: bpy.props.StringProperty(
+        default="*.json",
+        options={'HIDDEN'},
+        maxlen=255,
+    )
+
     def execute(self, context):
-        # Get the active material and node tree
-        mat = bpy.context.active_object.active_material
-        if mat is None:
-            self.report({'ERROR'}, "No material selected")
-            return {'CANCELLED'}
-        nodes = mat.node_tree.nodes
-
-        # Create a dictionary to hold the node and link data
-        data = {"nodes": [], "links": []}
-
-        # Loop through the nodes in the node tree and add their data to the dictionary
-        for node in nodes:
-            node_data = {"name": node.name, "type": node.bl_idname, "location": node.location.to_tuple()}
-            input_data_list = []
-            for input_socket in node.inputs:
-                if input_socket.type == 'SHADER':
-                    continue
-                input_data = {"name": input_socket.name}
-                if input_socket.default_value is not None:
-                    if isinstance(input_socket.default_value, bpy.types.bpy_prop_array):
-                        input_data["default_value"] = list(input_socket.default_value)
-                    else:
-                        input_data["default_value"] = input_socket.default_value
-                input_data_list.append(input_data)
-            node_data["inputs"] = input_data_list
-            data["nodes"].append(node_data)
-
-        # Loop through the links in the node tree and add their data to the dictionary
-        for link in mat.node_tree.links:
-            link_data = {"from_node": link.from_node.name, "from_output": link.from_socket.name,
-                        "to_node": link.to_node.name, "to_input": link.to_socket.name}
-            data["links"].append(link_data)
-
-        # Save the data to the selected file as JSON
-        with open(self.filepath, 'w') as f:
-            json.dump(data, f, indent=4)
-
+        node_tree = context.active_object.active_material.node_tree
+        file_path = self.filepath
+        export_node_tree(node_tree, file_path)
         return {'FINISHED'}
-
