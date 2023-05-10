@@ -10,7 +10,12 @@ Once enabled, find the NodeMaster panel in the Shader Editor, under the options 
 - GLTF output, use this to connect ambient occlusion. 
 - Suffix definition. If you have exported textures with different suffixs, "base_Color" instead of "Color", for example, edit the suffix to account for this.
 
+Exporter known supported nodes (Needs work):
+- Image textures (Does not save path)
+- Normal
+- Principled BSDF
+- Seperate Color
+Material Output
 To be added:
-- Node tree exports to JSON, to support custom structures, potentially imports too. Undecided on whether this will be accessed via File>Export/Import or from the NodeMaster panel in Shader Editor.
 - Dynamic Structure list, to handle custom structures, these will be added to a folder in documents, Ideally.
 - Add checkboxes for texture coordinantes, mapping, displacement, etc.
