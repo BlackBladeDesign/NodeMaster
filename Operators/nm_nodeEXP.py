@@ -22,6 +22,7 @@ def export_node_tree(node_tree, file_path):
     for node in node_tree.nodes:
         node_data = {
             'name': node.name,
+            'label': node.label,
             'type': type(node).__name__,
             'location': (node.location.x, node.location.y),
             'inputs': [(input.identifier, input.name, input.type)
@@ -52,9 +53,13 @@ def import_node_tree(file_path):
     node_dict = {}
     for node_data in data['nodes']:
         node_type = node_data['type']
+        node_name = node_data['name']
+        node_label = node_data['label']
         node_location = node_data['location']
         node = node_tree.nodes.new(node_type)
         node.location = node_location
+        node.name = node_name
+        node.label = node_label
 
         if node_type == 'ShaderNodeTexImage':
             color_space = node_data.get('color_space')

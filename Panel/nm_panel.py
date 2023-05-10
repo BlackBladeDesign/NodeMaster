@@ -21,8 +21,7 @@ class NodeMasterPanel(bpy.types.Panel):
         row.label(text="Set your path, load textures & nodes")
         row.operator("node.autoload", text="Load / Reload")
         row.operator("node.loadfrompath", text="Set Texture Path")
-        row.operator("node.importjson", text="Load Node Tree (JSON)")
-        row.operator("node.exportjson", text="Export Node Tree (JSON)")
+
 
 class nodeStructurePanel(bpy.types.Panel):
     bl_label = "Node Structure Settings"
@@ -40,6 +39,9 @@ class nodeStructurePanel(bpy.types.Panel):
         row.prop(context.scene.nm_props, "loadTextures", text="Load Image Textures")  
         row.prop(context.scene.nm_props, "apply_to", text=" Apply To")
         row.prop(context.scene.nm_props, "node_structure", text=" Node Structure")
+        row.label(text="")
+        row.operator("node.importjson", text="Load Node Tree (JSON)")
+        row.operator("node.exportjson", text="Export Node Tree (JSON)")
         
 
 class fileSettingsPanel(bpy.types.Panel):
