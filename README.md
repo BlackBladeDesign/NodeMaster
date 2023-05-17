@@ -38,6 +38,7 @@ If you have materials called 'Material', 'Material.001' and 'Material.002', for 
 - Principled BSDF
 - Seperate Color
 - Material Output
+
 **To be added:**
 - Dynamic Structure list, to handle custom structures, these will be added to a folder in documents, Ideally.
 - Add checkbox functionality for texture coordinantes, mapping, displacement, etc.
