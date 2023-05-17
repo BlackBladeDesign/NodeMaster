@@ -1,12 +1,12 @@
 **NodeMaster - Node Tree Automation Addon for Blender**
 
-Find the NodeMaster panel in the Shader Node Editor, under the options panel listed as a new tab.
-- Streamlined texture loading based on selected material's name.
+- Streamline texture loading based on selected material's name.
 - Node tree creation (Currently offering two structures, more coming soon)
 - Load/Reload function to load textures to corresponding nodes, and reload at any time when updating textures externally.
 - Image format definition, helpful for testing multiple image formats, I use this mostly for Substance Painter textures with different levels of compression.
 - GLTF output, use this to connect ambient occlusion. 
 - Suffix definition. If you have exported textures with different suffixs, "base_Color" instead of "Color", for example, edit the suffix to account for this.
+- Duplicate image and material cleaning tools. 
 
 ![Nodemaster](https://user-images.githubusercontent.com/126746830/236106941-168c7fbd-fbbc-43ce-8d19-f44f1b198716.png)
 
@@ -15,6 +15,7 @@ Find the NodeMaster panel in the Shader Node Editor, under the options panel lis
 - In Blender, navigate to add-ons via Edit>Preferences>Addons.
 - Click install in the top right of the Preferences addon window, and select the downloaded .ZIP file. 
 - Use the Checkbox once installed to enable or disable the addon. 
+- Find the NodeMaster panel in the Shader Node Editor, under the options panel listed as a new tab.
 If any issues persist, please create an issue referencing the bug and how to reproduce via: https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/issues
 
 **How to use:**
@@ -44,3 +45,5 @@ If you have materials called 'Material', 'Material.001' and 'Material.002', for 
 **To be added:**
 - Dynamic Structure list, to handle custom structures, these will be added to a folder in documents, Ideally.
 - Add checkbox functionality for texture coordinantes, mapping, displacement, etc.
+- Custom property mass add tool, for object properties or materials
+
