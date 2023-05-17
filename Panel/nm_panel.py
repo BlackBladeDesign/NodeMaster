@@ -21,6 +21,7 @@ class NodeMasterPanel(bpy.types.Panel):
         row.label(text="Set your path, load textures & nodes")
         row.operator("node.autoload", text="Load / Reload")
         row.operator("node.loadfrompath", text="Set Texture Path")
+        row.prop(context.scene.nm_props, "apply_to", text=" Apply To")
 
 
 class nodeStructurePanel(bpy.types.Panel):
@@ -36,8 +37,9 @@ class nodeStructurePanel(bpy.types.Panel):
         layout = self.layout
         # Main buttons and path
         row = layout.column()
-        row.prop(context.scene.nm_props, "loadTextures", text="Load Image Textures")  
-        row.prop(context.scene.nm_props, "apply_to", text=" Apply To")
+        row.prop(context.scene.nm_props, "loadImageNodes", text="Load Image Nodes")  
+        if context.scene.nm_props.loadImageNodes:
+            row.prop(context.scene.nm_props, "loadTextures", text="Load Image Assets")  
         row.prop(context.scene.nm_props, "node_structure", text=" Node Structure")
         row.label(text="")
         row.operator("node.importjson", text="Load Node Tree (JSON)")

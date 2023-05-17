@@ -14,10 +14,14 @@ bl_info = {
     "name": "NodeMaster",
     "description": "Streamlines and automates texture loading and node creation",
     "author": "BlackBladeDesign",
+    "developer": "BlackBladeDesign",
     "version": (1, 3),
     "blender": (3, 5, 0),
     "location": "Shader Editor > Options Panel > NodeMaster",
-    "category": "Shader"
+    "category": "Shader",
+    "warning": "Still under development. Be sure to save inbetween large operations to avoid lost progress",
+    "doc_url": "https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/blob/6cf5bd2d70def1a228a64453e71590976ac718ce/README.md",
+    "tracker_url": "https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/issues",
 }
   
 

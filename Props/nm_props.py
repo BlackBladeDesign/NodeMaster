@@ -5,9 +5,15 @@ import os
 
 class NodeMasterProperties(bpy.types.PropertyGroup):
     
+
+    loadImageNodes : bpy.props.BoolProperty(
+        name="Load Image Texture Nodes",
+        description="Enabled or disable to add or ignore adding image textures nodes.",
+        default=True
+    )
     loadTextures : bpy.props.BoolProperty(
-        name="Load Image Textures",
-        description="Enabled or disable to load image textures. Helpful for if you just want the node structure without images.",
+        name="Load Image assets",
+        description="Enabled or disable to load image textures assets. Helpful for if you just want the node structure without images.",
         default=True
     )
     gltf_Node : bpy.props.BoolProperty(
@@ -84,4 +90,14 @@ class NodeMasterProperties(bpy.types.PropertyGroup):
         name="Path",
         default = "/Textures"
     )
+    customProperty: bpy.props.StringProperty(
+        name="Custom Property",
+        default = "hidden"
+    )
+    custom_property_val: bpy.props.FloatProperty(
+        name="Custom Property Value",
+        default=0.0
+    )
+
+
 
