@@ -19,7 +19,7 @@ class NodeMasterProperties(bpy.types.PropertyGroup):
     gltf_Node : bpy.props.BoolProperty(
         name="Add glTF Node",
         description="Create a GLB/GLTF Output node, connect AO or ORM red channel to it for Ambient Occlusion.",
-        default=False
+        default=True
     )
     texCoord : bpy.props.BoolProperty(
         name="Add Texture Coord",
