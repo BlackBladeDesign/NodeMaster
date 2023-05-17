@@ -16,6 +16,7 @@
 - Click install in the top right of the Preferences addon window, and select the downloaded .ZIP file. 
 - Use the Checkbox once installed to enable or disable the addon. 
 - Find the NodeMaster panel in the Shader Node Editor, under the options panel listed as a new tab.
+
 If any issues persist, please create an issue referencing the bug and how to reproduce via: https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/issues
 
 **How to use:**
