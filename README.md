@@ -1,3 +1,5 @@
+**NodeMaster - Node Tree Automation Addon for Blender**
+
 Find the NodeMaster panel in the Shader Node Editor, under the options panel listed as a new tab.
 - Streamlined texture loading based on selected material's name.
 - Node tree creation (Currently offering two structures, more coming soon)
