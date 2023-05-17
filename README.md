@@ -7,6 +7,14 @@ Find the NodeMaster panel in the Shader Node Editor, under the options panel lis
 - Suffix definition. If you have exported textures with different suffixs, "base_Color" instead of "Color", for example, edit the suffix to account for this.
 
 ![Nodemaster](https://user-images.githubusercontent.com/126746830/236106941-168c7fbd-fbbc-43ce-8d19-f44f1b198716.png)
+
+**Installation:**
+- Download project as a .ZIP file via the green "<> Code" dropdown.
+- In Blender, navigate to add-ons via Edit>Preferences>Addons.
+- Click install in the top right of the Preferences addon window, and select the downloaded .ZIP file. 
+- Use the Checkbox once installed to enable or disable the addon. 
+If any issues persist, please create an issue referencing the bug and how to reproduce via: https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/issues
+
 **How to use:**
 - Ensure the texture names match your models material names. For example, if your material is "Handle", make sure your textures are named "Handle_Normal", "Handle_Color" etc.
 Nodemaster will use this name to find textures and streamline the loading process for each. 
