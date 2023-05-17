@@ -19,7 +19,7 @@ Nodemaster will use this name to find textures and streamline the loading proces
 - Adjust the suffixes for each texture in 'Texture Suffixes'. Eg. if your texture name in your files is "MaterialName_NormalMap.jpg" instead of MaterialName_Normal.jpg, change the suffix for it to find the file. Same with Color, BaseColor etc. 
 
 **Tools:**
-- Clean Duplicate Materials. (Dangerous, ensure all your materials are named correctly and not indexed. This will remove any indexed material.
+- Clean Duplicate Materials. (Dangerous, ensure all your unique materials are named correctly and not indexed. This will remove any indexed material.
 If you have materials called 'Material', 'Material.001' and 'Material.002', for example, Nodemaster will remove every numbered instance and set all materials using that name to the first 'Material".
 - Clean Duplicate Images. This will clean all duplicate instances of texture/image assets. If you have normalMap, normalMap.001, normalMap.002, for example, this will remove the indexed duplicates and use the original on everything. Helpful for large projects that are completed over a long time, or projects with many changes to textures. 
 
