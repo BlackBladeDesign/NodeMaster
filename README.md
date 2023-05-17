@@ -28,7 +28,9 @@ Nodemaster will use this name to find textures and streamline the loading proces
 - Choose whether to add Image Texture Nodes, and then whether those nodes will load image texture assets when you set a path or load/reload. 
 - Choose the file type in 'File Settings'.
 - In Material Settings, choose whether to add a GLTF/GLB output node, for GLB files. (Note that Tex Co-Ord and Displacement are non functional currently)
-- Adjust the suffixes for each texture in 'Texture Suffixes'. Eg. if your texture name in your files is "MaterialName_NormalMap.jpg" instead of MaterialName_Normal.jpg, change the suffix for it to find the file. Same with Color, BaseColor etc. 
+- Adjust the suffixes for each texture in 'Texture Suffixes'. Eg. if your texture name in your files is "MaterialName_NormalMap.jpg" instead of MaterialName_Normal.jpg, change the suffix for it to find the file. Same with Color, BaseColor etc.
+- Once satisfied with the settings, use the "Set Texture Path" button to find your texture folder. Once you are in the folder, click to load. This will automatically load the textures.
+- to reload the textures again - helpful when making changes to textures from substance and re-exporting, simply use the Load/Reload button.
 
 **Tools:**
 - Clean Duplicate Materials. (Dangerous, ensure all your unique materials are named correctly and not indexed. This will remove any indexed material.
