@@ -8,7 +8,7 @@
 - Suffix definition. If you have exported textures with different suffixs, "base_Color" instead of "Color", for example, edit the suffix to account for this.
 - Duplicate image and material cleaning tools. 
 
-![Nodemaster](https://user-images.githubusercontent.com/126746830/236106941-168c7fbd-fbbc-43ce-8d19-f44f1b198716.png)
+![Screenshot 2023-05-17 at 2 55 40 pm](https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/assets/126746830/a475efe8-d9cc-4708-9dfd-d1b26b9e1d1a)
 
 **Installation:**
 - Download project as a .ZIP file via the green "<> Code" dropdown.
