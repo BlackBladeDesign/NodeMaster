@@ -42,8 +42,7 @@ class nodeStructurePanel(bpy.types.Panel):
             row.prop(context.scene.nm_props, "loadTextures", text="Load Image Assets")  
         row.prop(context.scene.nm_props, "node_structure", text=" Node Structure")
         row.label(text="")
-        row.operator("node.importjson", text="Load Node Tree (JSON)")
-        row.operator("node.exportjson", text="Export Node Tree (JSON)")
+
         
 
 class fileSettingsPanel(bpy.types.Panel):
@@ -122,3 +121,5 @@ class nmToolsPanel(bpy.types.Panel):
         row = layout.column()
         row.operator("node.matcleaner", text="Clean Duplicate Materials")
         row.operator("node.imgcleaner", text="Clean Duplicate Images")
+        row.operator("node.importjson", text="Load Node Tree (JSON)")
+        row.operator("node.exportjson", text="Export Node Tree (JSON)")
