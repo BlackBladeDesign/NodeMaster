@@ -50,3 +50,25 @@ If you have materials called 'Material', 'Material.001' and 'Material.002', for 
 - Add checkbox functionality for texture coordinantes, mapping, displacement, etc.
 - Custom property mass add tool, for object properties or materials
 
+**Expand Automation with Super Batch Export**
+Using some of the current NodeMaster functionality you can add some lines to the Super Batch Export (By MrTripie) addon's __init__.py to automatically load textures for all selected models and export all, 
+this is helpful if you have a variety of models with unique textures but using the same material names, so you no longer have to load texture - export - repeat etc. See here where I added the lines:
+![Screenshot 2023-10-10 at 4 39 10 pm](https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/assets/126746830/3927cc86-f089-44cc-977a-bcb28b40a635)
+![Screenshot 2023-10-10 at 4 39 44 pm](https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/assets/126746830/8aa7da0f-2a89-46cb-af85-4f487e58598f)
+We call the texture load from the texture path set in NodeMaster for each object exported using the object name. So "Textures/Object 1" will automatically load etc. 
+Then we reset the path at the end of the export function in preparation for the next export.
+Lines to use:
+
+In this function: def export_selection(self, itemname, context, base_dir):
+
+Add this at the start of the function: textureFolder = 
+            bpy.data.scenes["Scene"].nm_props.texturePath
+Add this to the object for loop:    
+            tex_dir = textureFolder + '/' + obj.name
+            bpy.data.scenes["Scene"].nm_props.texturePath = tex_dir
+            bpy.data.scenes["Scene"].nm_props.apply_to = "ALL_ATTACHED"
+            bpy.ops.node.autoload()
+Add this to the very end of the function: 
+            bpy.data.scenes["Scene"].nm_props.texturePath = textureFolder
+
+
