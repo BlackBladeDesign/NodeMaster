@@ -3,6 +3,20 @@ from bpy.props import (EnumProperty, StringProperty, BoolProperty)
 from bpy.types import (PropertyGroup, Operator)
 import os
 
+def populate_node_structure_enum_items(self, context):
+    script_directory = os.path.dirname(__file__)  # Get the directory where the script is located
+    folder_path = os.path.join(script_directory, "NodeStructures")  # Combine with the subfolder name
+    items = []
+
+    if os.path.exists(folder_path) and os.path.isdir(folder_path):
+        for filename in os.listdir(folder_path):
+            if filename.endswith('.json'):
+                # Remove the .json extension
+                display_name = os.path.splitext(filename)[0]
+                items.append((filename, display_name, ''))
+
+    return items
+
 class NodeMasterProperties(bpy.types.PropertyGroup):
     
 
@@ -56,14 +70,8 @@ class NodeMasterProperties(bpy.types.PropertyGroup):
     node_structure: bpy.props.EnumProperty(
         name="Node Structure",
         description="Select the node structure to create, read about each on the github page.",
-        items=(
-            ("ORM_GLB", "ORM - GLB", "ORM GLB (Custom)"),
-            ("BLENDER_BSDF", "Blender (BSDF)", ""),
-            #("PBR_METALLIC_ROUGHNESS", "PBR (Metallic Roughness)", ""),
-            #("DOCUMENT_CHANNELS_NORMAL_AO_NO_ALPHA", "Document Channels + Normal + AO (No Alpha)", ""),
-            #("DOCUMENT_CHANNELS_NORMAL_AO_WITH_ALPHA", "Document Channels + Normal + AO (With Alpha)", ""),
-        ),
-        default="ORM_GLB"
+        items=populate_node_structure_enum_items,
+        default=None,
     )
         # Add two new StringProperty properties for texture names
     normal_map: bpy.props.StringProperty(

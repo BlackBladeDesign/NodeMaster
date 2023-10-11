@@ -2,7 +2,7 @@ import bpy
 import json
 from json import JSONEncoder
 from bpy_extras.io_utils import ExportHelper, ImportHelper
-from ..Operators.nm_operators import (connectNodes,createNode)
+from ..Operators.nm_operators import (connectNodes,createNode, errorGen)
 
 class NodeEncoder(JSONEncoder):
     def default(self, obj):
@@ -57,19 +57,22 @@ def export_node_tree(node_tree, file_path):
                 node_data['name'] = node.node_tree.name
 
                 for input_idx, input_socket in enumerate(node.inputs):
-                    # Mark this input as active
-                    node_data['inputs'].append((input_idx, input_socket.name, input_socket.type))
+                    input_name = input_socket.name
+                    input_type = input_socket.bl_idname  # Get the socket type using bl_idname
+                    node_data['inputs'].append((input_idx, input_name, input_type))
 
                 for output_idx, output_socket in enumerate(node.outputs):
-                    # Mark this output as active
-                    node_data['outputs'].append((output_idx, output_socket.name, output_socket.type))
-                
+                    output_name = output_socket.name
+                    output_type = output_socket.bl_idname  # Get the socket type using bl_idname
+                    node_data['outputs'].append((output_idx, output_name, output_type))
+
                 # Recursively export nodes inside the group
                 node_data['nodes'] = export_node_tree_internal(node.node_tree, id_dict)
             else:
                 # Regular node inputs and outputs
                 node_data['inputs'] = [(i, input.name, input.type) for i, input in enumerate(node.inputs)]
                 node_data['outputs'] = [(i, output.name, output.type) for i, output in enumerate(node.outputs)]
+
 
 
 
@@ -98,57 +101,105 @@ def export_node_tree(node_tree, file_path):
     return {'FINISHED'}
 
 
-
 def import_node_tree_internal(node_tree, data):
     node_dict = {}
+    group_dict = {}
+    
+    # Collect all existing nodes in the current node_tree
+    existing_nodes = node_tree.nodes
+
     for node_data in data['nodes']:
         node_type = node_data['type']
         node_name = node_data['name']
         node_label = node_data['label']
         node_location = node_data['location']
-        node = node_tree.nodes.new(node_type)
-        node.location = node_location
-        node.name = node_name
-        node.label = node_label
-        
-        if node_type == 'ShaderNodeTexImage':
-            color_space = node_data.get('color_space')
-            if color_space:
-                node.image.colorspace_settings.name = color_space
 
-        node_dict[node_data['name']] = node
-        if node_type == 'ShaderNodeGroup':
-            groupNodes = node_data['nodes']
-            newGroup = bpy.data.node_groups.new(name=node.name, type='ShaderNodeTree')
-            for groupInput in node_data['inputs']:
-                input_name, input_type = groupInput[1], groupInput[2]
-                try:
-                    new_input = newGroup.inputs.new(input_type, input_name)
-                except RuntimeError as e:
-                    print(f"Error creating input socket for {input_name}: {e}")
+        # Check if a node with the same name already exists in the current node_tree
+        existing_node = existing_nodes.get(node_name)
+        if existing_node:
+            node = existing_node
+        else:
+            if node_type == 'ShaderNodeGroup':
+                # Check if the group already exists
+                if node_name in bpy.data.node_groups:
+                    existing_group = bpy.data.node_groups[node_name]
+                    group_dict[node_name] = existing_group
+                else:
+                    groupNodes = node_data['nodes']
+                    group_inputs = node_data['inputs']
+                    group_outputs = node_data['outputs']
 
-            for groupOutput in node_data['outputs']:
-                output_name, output_type = groupOutput[1], groupOutput[2]
-                try:
-                    new_output = newGroup.outputs.new(output_type, output_name)
-                except RuntimeError as e:
-                    print(f"Error creating output socket for {output_name}: {e}")
+                    newGroup = bpy.data.node_groups.new(name=node_name, type='ShaderNodeTree')
+                    group_dict[node_name] = newGroup  # Store the group for linking
 
-            import_node_tree_internal(newGroup, groupNodes)
+                    # Create group inputs
+                    for input_idx, input_data in enumerate(group_inputs):
+                        input_name = input_data[1]
+                        input_socket_type = input_data[2]
+                        try:
+                            new_input = newGroup.inputs.new(input_socket_type, input_name)
+                        except RuntimeError as e:
+                            errorGen(f"Error creating input socket for {input_name} in group {node_name}: {e}", 'Error', 'ERROR')
+                            return
 
-    for link_data in data['links']:
-        from_node = node_dict.get(link_data[0])
-        to_node = node_dict.get(link_data[2])
+                    # Create group outputs (if needed)
+                    for output_idx, output_data in enumerate(group_outputs):
+                        output_name = output_data[1]
+                        output_socket_type = output_data[2]
+                        try:
+                            new_output = newGroup.outputs.new(output_socket_type, output_name)
+                        except RuntimeError as e:
+                            errorGen(f"Error creating output socket for {output_name} in group {node_name}: {e}", 'Error', 'ERROR')
+                            return
 
-        if from_node is not None and to_node is not None:
-            try:
-                from_socket = from_node.outputs[link_data[1]]
-                to_socket = to_node.inputs[link_data[3]]
-                node_tree.links.new(from_socket, to_socket)
-            except (IndexError, RuntimeError) as e:
-                print(f"Error creating link: {e}")
+                    # Recursively import nodes within the group
+                    import_node_tree_internal(newGroup, groupNodes)
+
+            # Now, create the node
+            if node_type == 'ShaderNodeGroup':
+                node = node_tree.nodes.new('ShaderNodeGroup')
+                node.node_tree = group_dict[node_name]  # Use the stored group
+            else:
+                node = node_tree.nodes.new(node_type)
+
+            node.location = node_location
+            node.name = node_name
+            node.label = node_label
+
+            if node_type == 'ShaderNodeTexImage':
+                color_space = node_data.get('color_space')
+                if color_space:
+                    node.image.colorspace_settings.name = color_space
+
+        node_dict[node_name] = node
+
+    # After processing all nodes, create the links
+    create_links(node_tree, data['links'], node_dict)
 
     return {'FINISHED'}
+
+def create_links(node_tree, links_data, node_dict):
+    for link_data in links_data:
+        from_node_name = link_data[0]
+        from_socket_index = link_data[1]
+        to_node_name = link_data[2]
+        to_socket_index = link_data[3]
+
+        from_node = node_dict.get(from_node_name)
+        to_node = node_dict.get(to_node_name)
+
+        if from_node is not None and to_node is not None:
+            from_socket = from_node.outputs[from_socket_index]
+            to_socket = to_node.inputs[to_socket_index]
+
+            # Create a link between nodes
+            try:
+                node_tree.links.new(from_socket, to_socket)
+            except (IndexError, RuntimeError) as e:
+                errorGen(f"Error creating link from {from_node_name} to {to_node_name}: {e}", 'Error', 'ERROR')
+                return
+        else:
+            errorGen(f"Node not found for link: {from_node_name} or {to_node_name}", 'Error', 'ERROR')
 
 def import_node_tree(file_path):
     with open(file_path, 'r') as file:

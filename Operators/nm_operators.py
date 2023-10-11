@@ -126,7 +126,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
     principled_node.inputs['Base Color'].default_value = (1.0, 1.0, 1.0, 1.0)
 
 
-    if node_structure == "BLENDER_BSDF":
+    if node_structure == "BLENDER_BSDF.json":
         met_Suffix = properties.metallic_texture if properties.metallic_texture != "" else "_Metallic"
         roughness_Suffix = properties.roughness_texture if properties.roughness_texture != "" else "_Roughness"
         # Create image texture nodes
@@ -157,7 +157,7 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
 
 
     
-    if node_structure == "ORM_GLB":
+    if node_structure == "ORM_GLB.json":
         orm_Suffix = properties.orm_texture if properties.orm_texture != "" else "_ORM"
 
         # Create Nodes for ORM GLB
