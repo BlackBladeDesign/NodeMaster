@@ -35,7 +35,7 @@ def assign_unique_ids(node_tree):
     return id_dict
 
 def export_node_tree(node_tree, file_path):
-    def export_node_tree_internal(node_tree,id_dict):
+    def export_node_tree_internal(node_tree, id_dict):
         data = {'nodes': [], 'links': []}
 
         node_dict = {}
@@ -48,33 +48,59 @@ def export_node_tree(node_tree, file_path):
                 'inputs': [],
                 'outputs': []
             }
-            
+
             if isinstance(node, bpy.types.ShaderNodeTexImage) and node.image is not None:
                 node_data['color_space'] = node.image.colorspace_settings.name
-                
+
             if node.type == 'GROUP':
                 # Handle group inputs and outputs separately
                 node_data['name'] = node.node_tree.name
 
                 for input_idx, input_socket in enumerate(node.inputs):
                     input_name = input_socket.name
-                    input_type = input_socket.bl_idname  # Get the socket type using bl_idname
-                    node_data['inputs'].append((input_idx, input_name, input_type))
+                    input_type = input_socket.bl_idname
 
-                for output_idx, output_socket in enumerate(node.outputs):
+                    input_value = None  # Default value for input value
+
+                    if hasattr(input_socket, 'default_value'):
+                        if isinstance(input_socket.default_value, float):
+                            input_value = str(input_socket.default_value)
+                        elif input_socket.bl_idname == 'NodeSocketColor':
+                            input_value = ', '.join(map(str, input_socket.default_value))
+                        else:
+                            input_value = ', '.join(map(str, input_socket.default_value))
+
+                    node_data['inputs'].append((input_idx, input_name, input_type, input_value))
+
+                for output_idx, output_socket in enumerate (node.outputs):
                     output_name = output_socket.name
-                    output_type = output_socket.bl_idname  # Get the socket type using bl_idname
+                    output_type = output_socket.bl_idname
                     node_data['outputs'].append((output_idx, output_name, output_type))
 
                 # Recursively export nodes inside the group
                 node_data['nodes'] = export_node_tree_internal(node.node_tree, id_dict)
             else:
                 # Regular node inputs and outputs
-                node_data['inputs'] = [(i, input.name, input.type) for i, input in enumerate(node.inputs)]
-                node_data['outputs'] = [(i, output.name, output.type) for i, output in enumerate(node.outputs)]
+                for input_idx, input_socket in enumerate(node.inputs):
+                    input_name = input_socket.name
+                    input_type = input_socket.bl_idname
 
+                    input_value = None  # Default value for input value
 
+                    if hasattr(input_socket, 'default_value'):
+                        if isinstance(input_socket.default_value, float):
+                            input_value = str(input_socket.default_value)
+                        elif input_socket.bl_idname == 'NodeSocketColor':
+                            input_value = ', '.join(map(str, input_socket.default_value))
+                        else:
+                            input_value = ', '.join(map(str, input_socket.default_value))
 
+                    node_data['inputs'].append((input_idx, input_name, input_type, input_value))
+
+                for output_idx, output_socket in enumerate(node.outputs):
+                    output_name = output_socket.name
+                    output_type = output_socket.bl_idname
+                    node_data['outputs'].append((output_idx, output_name, output_type))
 
             data['nodes'].append(node_data)
             node_dict[node.name] = node
@@ -88,11 +114,13 @@ def export_node_tree(node_tree, file_path):
             from_socket_idx = list(from_node.outputs).index(from_socket)
             to_socket_idx = list(to_node.inputs).index(to_socket)
 
-            data['links'].append((from_node.name, from_socket_idx, to_node.name, to_socket_idx))
+            from_name = from_node.node_tree.name if from_node.type == 'GROUP' else from_node.name
+            to_name = to_node.node_tree.name if to_node.type == 'GROUP' else to_node.name
+            data['links'].append((from_name, from_socket_idx, to_name, to_socket_idx))
 
         return data
 
-    id_dict = assign_unique_ids(node_tree)  # Dictionary to store unique IDs for nodes and groups
+    id_dict = assign_unique_ids(node_tree)
     data = export_node_tree_internal(node_tree, id_dict)
 
     with open(file_path, 'w', encoding='utf-8') as file:
@@ -100,11 +128,10 @@ def export_node_tree(node_tree, file_path):
 
     return {'FINISHED'}
 
-
 def import_node_tree_internal(node_tree, data):
     node_dict = {}
     group_dict = {}
-    
+    groupCreated = False
     # Collect all existing nodes in the current node_tree
     existing_nodes = node_tree.nodes
 
@@ -174,21 +201,27 @@ def import_node_tree_internal(node_tree, data):
         node_dict[node_name] = node
 
     # After processing all nodes, create the links
-    create_links(node_tree, data['links'], node_dict)
-
+    create_links(node_tree, data['links'], node_dict, group_dict)
+    
     return {'FINISHED'}
 
-def create_links(node_tree, links_data, node_dict):
+def create_links(node_tree, links_data, node_dict, group_dict):
     for link_data in links_data:
         from_node_name = link_data[0]
         from_socket_index = link_data[1]
         to_node_name = link_data[2]
         to_socket_index = link_data[3]
 
-        from_node = node_dict.get(from_node_name)
-        to_node = node_dict.get(to_node_name)
+        from_node = node_dict.get(from_node_name) or group_dict.get(from_node_name)
+        to_node = node_dict.get(to_node_name) or group_dict.get(to_node_name)
 
         if from_node is not None and to_node is not None:
+            # Check if the nodes are ShaderNodeGroups
+            if isinstance(from_node, bpy.types.NodeGroup):
+                from_node = from_node.nodes[from_socket_index]
+            if isinstance(to_node, bpy.types.NodeGroup):
+                to_node = to_node.nodes[to_socket_index]
+
             from_socket = from_node.outputs[from_socket_index]
             to_socket = to_node.inputs[to_socket_index]
 
@@ -198,9 +231,8 @@ def create_links(node_tree, links_data, node_dict):
             except (IndexError, RuntimeError) as e:
                 errorGen(f"Error creating link from {from_node_name} to {to_node_name}: {e}", 'Error', 'ERROR')
                 return
-        else:
-            errorGen(f"Node not found for link: {from_node_name} or {to_node_name}", 'Error', 'ERROR')
-
+    if bpy.context.active_object.active_material:
+        bpy.ops.node.view_all()
 def import_node_tree(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)
@@ -209,9 +241,9 @@ def import_node_tree(file_path):
     node_tree = selected_material.node_tree
     import_node_tree_internal(node_tree, data)
 
+    # Center the view on the selected nodes
+
     return {'FINISHED'}
-
-
 class ImportNodes(bpy.types.Operator, ImportHelper):
     bl_label = "Import Nodes"
     bl_idname = "node.importjson"
