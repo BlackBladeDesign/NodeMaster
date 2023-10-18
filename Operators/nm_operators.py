@@ -47,8 +47,48 @@ class LoadFromPath(Operator):
             applyMaterial(textures_dir, bpy.context.scene.nm_props)
 
             return {'FINISHED'}
-    
+class NodeEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, bpy.types.Node):
+            return obj.name
+        if isinstance(obj, bpy.types.NodeSocket):
+            return obj.identifier
+        if isinstance(obj, bpy.types.NodeLink):
+            return (obj.from_node.name, obj.from_socket.identifier,
+                    obj.to_node.name, obj.to_socket.identifier)
+        return super().default(obj)
 
+    
+class ImportNodes(bpy.types.Operator, ImportHelper):
+    bl_label = "Import Nodes"
+    bl_idname = "node.importjson"
+    filename_ext = ".json"
+
+    filter_glob: bpy.props.StringProperty(
+        default="*.json",
+        options={'HIDDEN'},
+        maxlen=255,
+    )
+
+    def execute(self, context):
+        file_path = self.filepath
+        import_node_tree(file_path)
+        return {'FINISHED'}
+class ExportNodes(bpy.types.Operator, ExportHelper):
+    bl_label = "Export Nodes"
+    bl_idname = "node.exportjson"
+    filename_ext = ".json"
+    filter_glob: bpy.props.StringProperty(
+        default="*.json",
+        options={'HIDDEN'},
+        maxlen=255,
+    )
+
+    def execute(self, context):
+        node_tree = context.active_object.active_material.node_tree
+        file_path = self.filepath
+        export_node_tree(node_tree, file_path)
+        return {'FINISHED'}
        
 def applyMaterial(textures_dir, properties):    
     apply_to = properties.apply_to
@@ -90,105 +130,62 @@ def applyMaterial(textures_dir, properties):
                 node_tree = mat.node_tree
                 material_name = mat.name
                 nTreeSetup(node_tree, textures_dir, material_name, properties)
- 
+def errorGen (msg, titleVar, iconVar):
+         message = msg
+         bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title=titleVar, icon=iconVar)
+
 #Sets up the node tree based on the structure selected in properties.         
-def nTreeSetup(node_tree, textures_dir, material_name, properties):
-   
-   #Properties
-    file_type = properties.image_file_type
-    node_structure = properties.node_structure
+def returnSuffix(node, properties):
+    # Create a dictionary to map node names to their corresponding values, including color space
+    orm_Suffix = properties.orm_texture if properties.orm_texture != "" else "_ORM"
     nm_Suffix = properties.normal_map if properties.normal_map != "" else "_Normal"
     col_Suffix = properties.base_color if properties.base_color != "" else "_Color"
-    
+    met_Suffix = properties.metallic_texture if properties.metallic_texture != "" else "_Metallic"
+    roughness_Suffix = properties.roughness_texture if properties.roughness_texture != "" else "_Roughness"
+
+    nodeDataMap = {
+        "Normal Map": (nm_Suffix, 'Non-Color'),  # Suffix, Color Space (None for now)
+        "NormalMap": (nm_Suffix, 'Non-Color'),
+        "ORM": (orm_Suffix, 'Non-Color'),
+        "Base Color": (col_Suffix, 'sRGB'),  # Specify the color space, e.g., "sRGB"
+        "Color": (col_Suffix, 'sRGB'),
+        "Roughness": (roughness_Suffix, 'Non-Color'),
+        "Metallic": (met_Suffix,'Non-Color')
+        # Add more mappings as needed
+    }
+
+    # Use the dictionary to look up the value based on the node name
+    if node in nodeDataMap:
+        return nodeDataMap[node]
+    else:
+        # Handle the case where the node name is not found in the dictionary
+        return ("Unknown", None)  # Default Suffix and Color Space
+
+# Sets up the node tree based on the structure selected in properties.
+def nTreeSetup(node_tree, textures_dir, material_name, properties):
     for node in node_tree.nodes:
         node_tree.nodes.remove(node)
+    # Properties
+    file_type = properties.image_file_type
+    node_structure = properties.node_structure
 
-    #Create the GLTF Node if set    
-    gltf_settings = None
-    if properties.gltf_Node:
-       for node in bpy.data.node_groups:
-            if node.name == "glTF Material Output":
-                gltf_settings = node
-                break
-       # If the "glTF Settings" node is not found, create it
-       if not gltf_settings:
-        gltf_settings = bpy.data.node_groups.new(name='glTF Material Output', type='ShaderNodeTree')
-       # Add an input called "Occlusion" to the "glTF Settings" node
-       if not gltf_settings.inputs.get('Occlusion'):
-        input_node = gltf_settings.nodes.new('NodeGroupInput')
-        input_node.name = 'Occlusion'
-        gltf_settings.inputs.new('NodeSocketVector', 'Occlusion')
-       # Add the "glTF Settings" node to the node tree
-       gltf_node = node_tree.nodes.new('ShaderNodeGroup')
-       gltf_node.node_tree = gltf_settings  
-       
-    # Create core nodes
-    principled_node = createNode(node_tree, 'ShaderNodeBsdfPrincipled', 'Principled BSDF',200, 200)
-    material_output_node = createNode(node_tree, 'ShaderNodeOutputMaterial', 'Material Output',600, 0)
-    connectNodes(node_tree, principled_node.outputs[0], material_output_node.inputs[0])
-    principled_node.inputs['Base Color'].default_value = (1.0, 1.0, 1.0, 1.0)
+    script_directory = os.path.dirname(__file__)
+    # Construct the path to the "Props/Nodestructures" directory
+    folder_path = os.path.abspath(os.path.join(script_directory, "../Props/Nodestructures"))
+    structureSelected = os.path.join(folder_path, node_structure)
+    import_node_tree(structureSelected)
+    for node in node_tree.nodes:
+        # Check if the node is a ShaderNodeTexImage
+        if isinstance(node, bpy.types.ShaderNodeTexImage):
+            node_name = node.name
+            # Use the returnSuffix function to get the image name
+            suffix = returnSuffix(node_name, properties)
+            if suffix [0] != "Unknown":
+                # Load the image texture based on the image name
+                node.image = loadImageTexture(textures_dir, material_name, suffix[0], file_type, suffix[1])
+                bpy.ops.node.imgcleaner()
+    focusOnNodes
 
-    
-    if node_structure == "BLENDER_BSDF.json":
-        met_Suffix = properties.metallic_texture if properties.metallic_texture != "" else "_Metallic"
-        roughness_Suffix = properties.roughness_texture if properties.roughness_texture != "" else "_Roughness"
-        # Create image texture nodes
-        normal_map_node = createNode(node_tree, 'ShaderNodeNormalMap','Normal',0, -350)
-        if bpy.context.scene.nm_props.loadImageNodes:
-            basecolor_node = createNode(node_tree, 'ShaderNodeTexImage','Color',-400, 200)
-            metallic_node = createNode(node_tree, 'ShaderNodeTexImage','Metallic', -400, -100)
-            roughness_node = createNode(node_tree, 'ShaderNodeTexImage','Roughness',-100, -100)
-            normal_node = createNode(node_tree, 'ShaderNodeTexImage','NormalMap',-300, -400)
-            #Load Textures
-            normal_node.image = loadImageTexture(textures_dir, material_name, nm_Suffix, file_type, 'Non-Color')
-            metallic_node.image = loadImageTexture(textures_dir, material_name, met_Suffix, file_type, 'Non-Color')        
-            roughness_node.image = loadImageTexture(textures_dir, material_name, roughness_Suffix, file_type, 'Non-Color')
-            basecolor_node.image = loadImageTexture(textures_dir, material_name, col_Suffix, file_type, 'sRGB')
-            bpy.ops.node.imgcleaner()
-            if gltf_settings:
-                ao_node = createNode(node_tree, 'ShaderNodeTexImage','AO',-800,0)
-                connectNodes(node_tree, ao_node.outputs['Color'], gltf_node.inputs[0])
-                gltf_node.location = (0,50)
-        #connect Nodes
-            connectNodes(node_tree, normal_node.outputs['Color'], normal_map_node.inputs['Color'])
-            connectNodes(node_tree, basecolor_node.outputs['Color'], principled_node.inputs['Base Color'])
-            connectNodes(node_tree, metallic_node.outputs['Color'], principled_node.inputs['Metallic'])
-            connectNodes(node_tree, roughness_node.outputs['Color'], principled_node.inputs['Roughness'])
-        connectNodes(node_tree, normal_map_node.outputs['Normal'], principled_node.inputs['Normal'])
-        
-
-
-
-    
-    if node_structure == "ORM_GLB.json":
-        orm_Suffix = properties.orm_texture if properties.orm_texture != "" else "_ORM"
-
-        # Create Nodes for ORM GLB
-        sep_color_node = createNode(node_tree, 'ShaderNodeSeparateColor','Separate Color',-100, -100)
-        normal_node = createNode(node_tree, 'ShaderNodeNormalMap','Normal',0, -350)
-        if bpy.context.scene.nm_props.loadImageNodes:
-            normal_map_node = createNode(node_tree, 'ShaderNodeTexImage','Normal Map',-300, -400)
-            orm_node = createNode(node_tree, 'ShaderNodeTexImage','ORM',-400, -100)
-            basecolor_node = createNode(node_tree, 'ShaderNodeTexImage','Color', -400, 200)
-            #Load images
-            orm_node.image = loadImageTexture(textures_dir, material_name, orm_Suffix, file_type, 'Non-Color')
-            normal_map_node.image = loadImageTexture(textures_dir, material_name, nm_Suffix, file_type, 'Non-Color')
-            basecolor_node.image = loadImageTexture(textures_dir, material_name, col_Suffix, file_type, 'sRGB')
-            bpy.ops.node.imgcleaner()
-        # Connect Nodes 
-            connectNodes(node_tree, orm_node.outputs[0], sep_color_node.inputs[0])
-            connectNodes(node_tree, basecolor_node.outputs[0], principled_node.inputs['Base Color'])
-            connectNodes(node_tree, normal_map_node.outputs[0], normal_node.inputs[1])
-        connectNodes(node_tree, normal_node.outputs[0], principled_node.inputs['Normal'])
-        connectNodes(node_tree, sep_color_node.outputs[2], principled_node.inputs['Metallic'])
-        connectNodes(node_tree, sep_color_node.outputs[1], principled_node.inputs['Roughness'])
-        if gltf_settings:
-           connectNodes(node_tree, sep_color_node.outputs[0], gltf_node.inputs[0])
-
-     
-
-
- 
 def createNode(node_tree, node_type, node_name, x, y):
     # Check if node with the given name already exists
     existing_node = None
@@ -214,16 +211,14 @@ def loadImageTexture(texDir, material, suffix, filetype, colorSpace):
         newPath = os.path.join(texDir, (material + suffix + filetype))
         if os.path.exists(newPath):
             image = bpy.data.images.load(newPath)
-            image.colorspace_settings.name = colorSpace
-            image.name = material+suffix+filetype
+            if colorSpace is not None:
+                image.colorspace_settings.name = colorSpace
+            image.name = material + suffix + filetype
             return image
         else:
             errorGen("Missing Textures: {}".format(newPath), 'Error', 'FILE_BLANK')
      else:
         return
-def errorGen (msg, titleVar, iconVar):
-         message = msg
-         bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title=titleVar, icon=iconVar)
 
 def connectNodes(node_tree, output_socket, input_socket):
     links = node_tree.links
@@ -251,17 +246,6 @@ def addProperty (selection, customProperty, value, applyMat, applyOBJ):
             for obj in selection:
                 # add a custom property with the specified name and value to the object
                 obj[customProperty] = value
-class NodeEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, bpy.types.Node):
-            return obj.name
-        if isinstance(obj, bpy.types.NodeSocket):
-            return obj.identifier
-        if isinstance(obj, bpy.types.NodeLink):
-            return (obj.from_node.name, obj.from_socket.identifier,
-                    obj.to_node.name, obj.to_socket.identifier)
-        return super().default(obj)
-
 
 def assign_unique_ids(node_tree):
     # Create a dictionary to store IDs for nodes and groups
@@ -374,11 +358,26 @@ def export_node_tree(node_tree, file_path):
         json.dump(data, file, cls=NodeEncoder, ensure_ascii=False, indent=4)
 
     return {'FINISHED'}
+def import_node_tree(file_path):
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+        # Get the active object
+    obj = bpy.context.active_object
+    # Check if there is an active object and if it has an active material
+    if  obj == None or obj and obj.active_material == None:
+        errorGen("No Material or Object Selected{}".format("."), 'Error', 'FILE_BLANK')              
+    else:
+        selected_material = obj.active_material
+        node_tree = selected_material.node_tree
+        import_node_tree_internal(node_tree, data)
+
+    # Center the view on the selected nodes
+
+    return {'FINISHED'}
 
 def import_node_tree_internal(node_tree, data):
     node_dict = {}
     group_dict = {}
-    groupCreated = False
     # Collect all existing nodes in the current node_tree
     existing_nodes = node_tree.nodes
 
@@ -435,15 +434,17 @@ def import_node_tree_internal(node_tree, data):
                 node.node_tree = group_dict[node_name]  # Use the stored group
             else:
                 node = node_tree.nodes.new(node_type)
+                if node_type == 'ShaderNodeTexImage':
+                    color_space = node_data.get('color_space')
+                    if color_space:
+                        if node.image:
+                            node.image.colorspace_settings.name = color_space
+
 
             node.location = node_location
             node.name = node_name
             node.label = node_label
 
-            if node_type == 'ShaderNodeTexImage':
-                color_space = node_data.get('color_space')
-                if color_space:
-                    node.image.colorspace_settings.name = color_space
 
         node_dict[node_name] = node
 
@@ -478,46 +479,10 @@ def create_links(node_tree, links_data, node_dict, group_dict):
             except (IndexError, RuntimeError) as e:
                 errorGen(f"Error creating link from {from_node_name} to {to_node_name}: {e}", 'Error', 'ERROR')
                 return
-    if bpy.context.active_object.active_material:
-        bpy.ops.node.view_all()
-def import_node_tree(file_path):
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-
-    selected_material = bpy.context.active_object.active_material
-    node_tree = selected_material.node_tree
-    import_node_tree_internal(node_tree, data)
-
-    # Center the view on the selected nodes
-
-    return {'FINISHED'}
-class ImportNodes(bpy.types.Operator, ImportHelper):
-    bl_label = "Import Nodes"
-    bl_idname = "node.importjson"
-    filename_ext = ".json"
-
-    filter_glob: bpy.props.StringProperty(
-        default="*.json",
-        options={'HIDDEN'},
-        maxlen=255,
-    )
-
-    def execute(self, context):
-        file_path = self.filepath
-        import_node_tree(file_path)
-        return {'FINISHED'}
-class ExportNodes(bpy.types.Operator, ExportHelper):
-    bl_label = "Export Nodes"
-    bl_idname = "node.exportjson"
-    filename_ext = ".json"
-    filter_glob: bpy.props.StringProperty(
-        default="*.json",
-        options={'HIDDEN'},
-        maxlen=255,
-    )
-
-    def execute(self, context):
-        node_tree = context.active_object.active_material.node_tree
-        file_path = self.filepath
-        export_node_tree(node_tree, file_path)
-        return {'FINISHED'}
+    focusOnNodes
+def focusOnNodes():
+    node_tree = bpy.context.space_data.node_tree
+    if node_tree:
+        for node in node_tree.nodes:
+            node.select = True
+        bpy.ops.view.all('INVOKE_DEFAULT')

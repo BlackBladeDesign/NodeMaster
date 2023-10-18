@@ -1,18 +1,319 @@
 {
     "nodes": [
         {
+            "name": "Principled BSDF",
+            "label": "Principled BSDF",
+            "type": "ShaderNodeBsdfPrincipled",
+            "location": [
+                253.06192016601562,
+                214.47003173828125
+            ],
+            "inputs": [
+                [
+                    0,
+                    "Base Color",
+                    "NodeSocketColor",
+                    "0.800000011920929, 0.800000011920929, 0.800000011920929, 1.0"
+                ],
+                [
+                    1,
+                    "Subsurface",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    2,
+                    "Subsurface Radius",
+                    "NodeSocketVector",
+                    "1.0, 0.20000000298023224, 0.10000000149011612"
+                ],
+                [
+                    3,
+                    "Subsurface Color",
+                    "NodeSocketColor",
+                    "0.800000011920929, 0.800000011920929, 0.800000011920929, 1.0"
+                ],
+                [
+                    4,
+                    "Subsurface IOR",
+                    "NodeSocketFloatFactor",
+                    "1.399999976158142"
+                ],
+                [
+                    5,
+                    "Subsurface Anisotropy",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    6,
+                    "Metallic",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    7,
+                    "Specular",
+                    "NodeSocketFloatFactor",
+                    "0.5"
+                ],
+                [
+                    8,
+                    "Specular Tint",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    9,
+                    "Roughness",
+                    "NodeSocketFloatFactor",
+                    "0.5"
+                ],
+                [
+                    10,
+                    "Anisotropic",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    11,
+                    "Anisotropic Rotation",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    12,
+                    "Sheen",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    13,
+                    "Sheen Tint",
+                    "NodeSocketFloatFactor",
+                    "0.5"
+                ],
+                [
+                    14,
+                    "Clearcoat",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    15,
+                    "Clearcoat Roughness",
+                    "NodeSocketFloatFactor",
+                    "0.029999999329447746"
+                ],
+                [
+                    16,
+                    "IOR",
+                    "NodeSocketFloat",
+                    "1.4500000476837158"
+                ],
+                [
+                    17,
+                    "Transmission",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    18,
+                    "Transmission Roughness",
+                    "NodeSocketFloatFactor",
+                    "0.0"
+                ],
+                [
+                    19,
+                    "Emission",
+                    "NodeSocketColor",
+                    "0.0, 0.0, 0.0, 1.0"
+                ],
+                [
+                    20,
+                    "Emission Strength",
+                    "NodeSocketFloat",
+                    "1.0"
+                ],
+                [
+                    21,
+                    "Alpha",
+                    "NodeSocketFloatFactor",
+                    "1.0"
+                ],
+                [
+                    22,
+                    "Normal",
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
+                ],
+                [
+                    23,
+                    "Clearcoat Normal",
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
+                ],
+                [
+                    24,
+                    "Tangent",
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
+                ],
+                [
+                    25,
+                    "Weight",
+                    "NodeSocketFloat",
+                    "0.0"
+                ]
+            ],
+            "outputs": [
+                [
+                    0,
+                    "BSDF",
+                    "NodeSocketShader"
+                ]
+            ]
+        },
+        {
+            "name": "Material Output",
+            "label": "Material Output",
+            "type": "ShaderNodeOutputMaterial",
+            "location": [
+                653.0618896484375,
+                14.470030784606934
+            ],
+            "inputs": [
+                [
+                    0,
+                    "Surface",
+                    "NodeSocketShader",
+                    null
+                ],
+                [
+                    1,
+                    "Volume",
+                    "NodeSocketShader",
+                    null
+                ],
+                [
+                    2,
+                    "Displacement",
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
+                ],
+                [
+                    3,
+                    "Thickness",
+                    "NodeSocketFloat",
+                    "0.0"
+                ]
+            ],
+            "outputs": []
+        },
+        {
+            "name": "Normal",
+            "label": "Normal",
+            "type": "ShaderNodeNormalMap",
+            "location": [
+                53.061920166015625,
+                -335.52996826171875
+            ],
+            "inputs": [
+                [
+                    0,
+                    "Strength",
+                    "NodeSocketFloat",
+                    "1.0"
+                ],
+                [
+                    1,
+                    "Color",
+                    "NodeSocketColor",
+                    "0.5, 0.5, 1.0, 1.0"
+                ]
+            ],
+            "outputs": [
+                [
+                    0,
+                    "Normal",
+                    "NodeSocketVector"
+                ]
+            ]
+        },
+        {
+            "name": "Normal Map",
+            "label": "Normal Map",
+            "type": "ShaderNodeTexImage",
+            "location": [
+                -246.93807983398438,
+                -385.52996826171875
+            ],
+            "inputs": [
+                [
+                    0,
+                    "Vector",
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
+                ]
+            ],
+            "outputs": [
+                [
+                    0,
+                    "Color",
+                    "NodeSocketColor"
+                ],
+                [
+                    1,
+                    "Alpha",
+                    "NodeSocketFloat"
+                ]
+            ],
+            "color_space": "Non-Color"
+        },
+        {
+            "name": "NormalMap",
+            "label": "NormalMap",
+            "type": "ShaderNodeTexImage",
+            "location": [
+                -246.93807983398438,
+                -385.52996826171875
+            ],
+            "inputs": [
+                [
+                    0,
+                    "Vector",
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
+                ]
+            ],
+            "outputs": [
+                [
+                    0,
+                    "Color",
+                    "NodeSocketColor"
+                ],
+                [
+                    1,
+                    "Alpha",
+                    "NodeSocketFloat"
+                ]
+            ],
+            "color_space": "Non-Color"
+        },
+        {
             "name": "glTF Material Output",
             "label": "",
             "type": "ShaderNodeGroup",
             "location": [
-                0.0,
-                50.0
+                36.27996826171875,
+                82.93441009521484
             ],
             "inputs": [
                 [
                     0,
                     "Occlusion",
-                    "VECTOR"
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
                 ]
             ],
             "outputs": [],
@@ -31,12 +332,12 @@
                             [
                                 0,
                                 "Occlusion",
-                                "VECTOR"
+                                "NodeSocketVector"
                             ],
                             [
                                 1,
                                 "",
-                                "CUSTOM"
+                                "NodeSocketVirtual"
                             ]
                         ]
                     }
@@ -45,352 +346,124 @@
             }
         },
         {
-            "name": "Principled BSDF",
-            "label": "Principled BSDF",
-            "type": "ShaderNodeBsdfPrincipled",
-            "location": [
-                200.0,
-                200.0
-            ],
-            "inputs": [
-                [
-                    0,
-                    "Base Color",
-                    "RGBA"
-                ],
-                [
-                    1,
-                    "Subsurface",
-                    "VALUE"
-                ],
-                [
-                    2,
-                    "Subsurface Radius",
-                    "VECTOR"
-                ],
-                [
-                    3,
-                    "Subsurface Color",
-                    "RGBA"
-                ],
-                [
-                    4,
-                    "Subsurface IOR",
-                    "VALUE"
-                ],
-                [
-                    5,
-                    "Subsurface Anisotropy",
-                    "VALUE"
-                ],
-                [
-                    6,
-                    "Metallic",
-                    "VALUE"
-                ],
-                [
-                    7,
-                    "Specular",
-                    "VALUE"
-                ],
-                [
-                    8,
-                    "Specular Tint",
-                    "VALUE"
-                ],
-                [
-                    9,
-                    "Roughness",
-                    "VALUE"
-                ],
-                [
-                    10,
-                    "Anisotropic",
-                    "VALUE"
-                ],
-                [
-                    11,
-                    "Anisotropic Rotation",
-                    "VALUE"
-                ],
-                [
-                    12,
-                    "Sheen",
-                    "VALUE"
-                ],
-                [
-                    13,
-                    "Sheen Tint",
-                    "VALUE"
-                ],
-                [
-                    14,
-                    "Clearcoat",
-                    "VALUE"
-                ],
-                [
-                    15,
-                    "Clearcoat Roughness",
-                    "VALUE"
-                ],
-                [
-                    16,
-                    "IOR",
-                    "VALUE"
-                ],
-                [
-                    17,
-                    "Transmission",
-                    "VALUE"
-                ],
-                [
-                    18,
-                    "Transmission Roughness",
-                    "VALUE"
-                ],
-                [
-                    19,
-                    "Emission",
-                    "RGBA"
-                ],
-                [
-                    20,
-                    "Emission Strength",
-                    "VALUE"
-                ],
-                [
-                    21,
-                    "Alpha",
-                    "VALUE"
-                ],
-                [
-                    22,
-                    "Normal",
-                    "VECTOR"
-                ],
-                [
-                    23,
-                    "Clearcoat Normal",
-                    "VECTOR"
-                ],
-                [
-                    24,
-                    "Tangent",
-                    "VECTOR"
-                ],
-                [
-                    25,
-                    "Weight",
-                    "VALUE"
-                ]
-            ],
-            "outputs": [
-                [
-                    0,
-                    "BSDF",
-                    "SHADER"
-                ]
-            ]
-        },
-        {
-            "name": "Material Output",
-            "label": "Material Output",
-            "type": "ShaderNodeOutputMaterial",
-            "location": [
-                600.0,
-                0.0
-            ],
-            "inputs": [
-                [
-                    0,
-                    "Surface",
-                    "SHADER"
-                ],
-                [
-                    1,
-                    "Volume",
-                    "SHADER"
-                ],
-                [
-                    2,
-                    "Displacement",
-                    "VECTOR"
-                ],
-                [
-                    3,
-                    "Thickness",
-                    "VALUE"
-                ]
-            ],
-            "outputs": []
-        },
-        {
-            "name": "Normal",
-            "label": "Normal",
-            "type": "ShaderNodeNormalMap",
-            "location": [
-                0.0,
-                -350.0
-            ],
-            "inputs": [
-                [
-                    0,
-                    "Strength",
-                    "VALUE"
-                ],
-                [
-                    1,
-                    "Color",
-                    "RGBA"
-                ]
-            ],
-            "outputs": [
-                [
-                    0,
-                    "Normal",
-                    "VECTOR"
-                ]
-            ]
-        },
-        {
-            "name": "Color",
-            "label": "Color",
+            "name": "AO",
+            "label": "AO",
             "type": "ShaderNodeTexImage",
             "location": [
-                -400.0,
-                200.0
+                -746.9381103515625,
+                14.470030784606934
             ],
             "inputs": [
                 [
                     0,
                     "Vector",
-                    "VECTOR"
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
                 ]
             ],
             "outputs": [
                 [
                     0,
                     "Color",
-                    "RGBA"
+                    "NodeSocketColor"
                 ],
                 [
                     1,
                     "Alpha",
-                    "VALUE"
-                ]
-            ]
-        },
-        {
-            "name": "Metallic",
-            "label": "Metallic",
-            "type": "ShaderNodeTexImage",
-            "location": [
-                -400.0,
-                -100.0
-            ],
-            "inputs": [
-                [
-                    0,
-                    "Vector",
-                    "VECTOR"
+                    "NodeSocketFloat"
                 ]
             ],
-            "outputs": [
-                [
-                    0,
-                    "Color",
-                    "RGBA"
-                ],
-                [
-                    1,
-                    "Alpha",
-                    "VALUE"
-                ]
-            ]
+            "color_space": "sRGB"
         },
         {
             "name": "Roughness",
             "label": "Roughness",
             "type": "ShaderNodeTexImage",
             "location": [
-                -100.0,
-                -100.0
+                -626.45068359375,
+                -283.66339111328125
             ],
             "inputs": [
                 [
                     0,
                     "Vector",
-                    "VECTOR"
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
                 ]
             ],
             "outputs": [
                 [
                     0,
                     "Color",
-                    "RGBA"
+                    "NodeSocketColor"
                 ],
                 [
                     1,
                     "Alpha",
-                    "VALUE"
+                    "NodeSocketFloat"
                 ]
-            ]
+            ],
+            "color_space": "sRGB"
         },
         {
-            "name": "NormalMap",
-            "label": "NormalMap",
+            "name": "Color",
+            "label": "Color",
             "type": "ShaderNodeTexImage",
             "location": [
-                -300.0,
-                -400.0
+                -323.47088623046875,
+                386.546142578125
             ],
             "inputs": [
                 [
                     0,
                     "Vector",
-                    "VECTOR"
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
                 ]
             ],
             "outputs": [
                 [
                     0,
                     "Color",
-                    "RGBA"
+                    "NodeSocketColor"
                 ],
                 [
                     1,
                     "Alpha",
-                    "VALUE"
+                    "NodeSocketFloat"
                 ]
-            ]
+            ],
+            "color_space": "sRGB"
         },
         {
-            "name": "AO",
-            "label": "AO",
+            "name": "Metallic",
+            "label": "Metallic",
             "type": "ShaderNodeTexImage",
             "location": [
-                -800.0,
-                0.0
+                -389.1363830566406,
+                -28.44186782836914
             ],
             "inputs": [
                 [
                     0,
                     "Vector",
-                    "VECTOR"
+                    "NodeSocketVector",
+                    "0.0, 0.0, 0.0"
                 ]
             ],
             "outputs": [
                 [
                     0,
                     "Color",
-                    "RGBA"
+                    "NodeSocketColor"
                 ],
                 [
                     1,
                     "Alpha",
-                    "VALUE"
+                    "NodeSocketFloat"
                 ]
-            ]
+            ],
+            "color_space": "sRGB"
         }
     ],
     "links": [
@@ -398,12 +471,6 @@
             "Principled BSDF",
             0,
             "Material Output",
-            0
-        ],
-        [
-            "AO",
-            0,
-            "Group",
             0
         ],
         [
@@ -435,6 +502,12 @@
             0,
             "Principled BSDF",
             22
+        ],
+        [
+            "AO",
+            0,
+            "glTF Material Output",
+            0
         ]
     ]
 }

@@ -102,11 +102,9 @@ class texSuffixPanel(bpy.types.Panel):
         row2 = layout.column()
         row2.prop(context.scene.nm_props, "normal_map", text="- Normal Map")
         row2.prop(context.scene.nm_props, "base_color", text="- Base Color")
-        if context.scene.nm_props.node_structure == "ORM_GLB":
-            row2.prop(context.scene.nm_props, "orm_texture", text="- ORM")
-        if context.scene.nm_props.node_structure == "BLENDER_BSDF":
-            row2.prop(context.scene.nm_props, "roughness_texture", text="- Roughness")
-            row2.prop(context.scene.nm_props, "metallic_texture", text="- Metallic")
+        row2.prop(context.scene.nm_props, "orm_texture", text="- ORM")
+        row2.prop(context.scene.nm_props, "roughness_texture", text="- Roughness")
+        row2.prop(context.scene.nm_props, "metallic_texture", text="- Metallic")
 class nmToolsPanel(bpy.types.Panel):        
     bl_label = "Tools"
     bl_idname = "NODE_PT_nodemaster_tools"

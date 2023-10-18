@@ -67,13 +67,7 @@ class NodeMasterProperties(bpy.types.PropertyGroup):
         ),
         default="SELECTED"
     )
-    node_structure: bpy.props.EnumProperty(
-        name="Node Structure",
-        description="Select the node structure to create, read about each on the github page.",
-        items=populate_node_structure_enum_items,
-        default=None,
-    )
-        # Add two new StringProperty properties for texture names
+            # Add two new StringProperty properties for texture names
     normal_map: bpy.props.StringProperty(
         name="Normal Map",
         default="_Normal"
@@ -106,6 +100,13 @@ class NodeMasterProperties(bpy.types.PropertyGroup):
         name="Custom Property Value",
         default=0.0
     )
+    node_structure: bpy.props.EnumProperty(
+        name="Node Structure",
+        description="Select the node structure to create, read about each on the github page.",
+        items=populate_node_structure_enum_items,
+        default=None,
+    )
+
 
 
 
