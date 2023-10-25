@@ -18,11 +18,15 @@ def populate_node_structure_enum_items(self, context):
     return items
 
 class NodeMasterProperties(bpy.types.PropertyGroup):
-    
 
     loadImageNodes : bpy.props.BoolProperty(
         name="Load Image Texture Nodes",
         description="Enabled or disable to add or ignore adding image textures nodes.",
+        default=True
+    )
+    clearNodes : bpy.props.BoolProperty(
+        name="clear all nodes on load/reload",
+        description="Clears all nodes in selected node tree prior to building new structure",
         default=True
     )
     loadTextures : bpy.props.BoolProperty(
@@ -66,6 +70,17 @@ class NodeMasterProperties(bpy.types.PropertyGroup):
             ("ALL_VISIBLE", "All Visible", ""),
         ),
         default="SELECTED"
+    )
+
+    apply_propertyTo: bpy.props.EnumProperty(
+        name="Apply Property To",
+        description="Apply Custom Property to the selected material, Objects, or Both",
+        items=(
+            ("Material", "Materials", ""),
+            ("Object", "Objecs", ""),
+            ("ALL", "All", ""),
+        ),
+        default="Material"
     )
             # Add two new StringProperty properties for texture names
     normal_map: bpy.props.StringProperty(

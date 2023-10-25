@@ -2,7 +2,7 @@ import bpy
 from bpy.types import Panel
 from bpy.props import EnumProperty, StringProperty
 
-from ..Operators.nm_operators import (LoadFromPath, AutoLoad)
+from ..Operators.nm_operators import (LoadFromPath, AutoLoad,AddProperty)
 from ..Props.nm_props import NodeMasterProperties
 
 
@@ -37,7 +37,8 @@ class nodeStructurePanel(bpy.types.Panel):
         layout = self.layout
         # Main buttons and path
         row = layout.column()
-        row.prop(context.scene.nm_props, "loadImageNodes", text="Load Image Nodes")  
+        row.prop(context.scene.nm_props, "loadImageNodes", text="Load Image Nodes")
+        row.prop(context.scene.nm_props, "clearNodes", text="Clear All Nodes")    
         if context.scene.nm_props.loadImageNodes:
             row.prop(context.scene.nm_props, "loadTextures", text="Load Image Assets")  
         row.prop(context.scene.nm_props, "node_structure", text=" Node Structure")
@@ -121,3 +122,9 @@ class nmToolsPanel(bpy.types.Panel):
         row.operator("node.imgcleaner", text="Clean Duplicate Images")
         row.operator("node.importjson", text="Load Node Tree (JSON)")
         row.operator("node.exportjson", text="Export Node Tree (JSON)")
+        row.operator("node.addproperty", text="Add Custom Property")
+
+        row.prop(context.scene.nm_props, "apply_propertyTo", text=" Apply Property To")
+        row.prop(context.scene.nm_props, "customProperty", text="Custom Property")
+        row.prop(context.scene.nm_props, "custom_property_val", text="Custom Property Value")
+

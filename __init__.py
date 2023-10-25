@@ -3,7 +3,7 @@ from bpy.props import PointerProperty
 from bpy.props import (EnumProperty, StringProperty, BoolProperty)
 from bpy.types import (Panel,Operator,AddonPreferences,PropertyGroup)
 from .Panel.nm_panel import NodeMasterPanel, matSettingsPanel, texSuffixPanel, fileSettingsPanel, nodeStructurePanel, nmToolsPanel
-from .Operators.nm_operators import AutoLoad, LoadFromPath, ImportNodes, ExportNodes
+from .Operators.nm_operators import AutoLoad, LoadFromPath, ImportNodes, ExportNodes, AddProperty
 from .Props.nm_props import NodeMasterProperties
 from .Operators.nm_matCleanup import matCleanup, imgCleanup
 
@@ -30,6 +30,7 @@ classes = [
     NodeMasterPanel,
     AutoLoad,
     LoadFromPath,
+    AddProperty,
     ImportNodes,
     ExportNodes,
     nodeStructurePanel,

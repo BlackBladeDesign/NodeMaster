@@ -89,7 +89,31 @@ class ExportNodes(bpy.types.Operator, ExportHelper):
         file_path = self.filepath
         export_node_tree(node_tree, file_path)
         return {'FINISHED'}
-       
+class AddProperty(Operator):
+    bl_label = "Add Custom Property"
+    bl_idname = "node.addproperty"
+
+    def execute(self, context):
+        properties = context.scene.nm_props
+        apply = properties.apply_propertyTo
+        customProperty = properties.customProperty
+        value = properties.custom_property_val
+        selection = context.selected_objects
+
+        if apply == "Material":
+            for obj in selection:
+                # Loop through all materials in the object
+                for mat_slot in obj.material_slots:
+                    mat = mat_slot.material
+                    # Add a custom property named "refractionIOR" with a value to the material
+                    mat[customProperty] = value
+        elif apply == "Object":
+            for obj in selection:
+                # Add a custom property with the specified name and value to the object
+                obj[customProperty] = value
+
+        return {'FINISHED'}
+
 def applyMaterial(textures_dir, properties):    
     apply_to = properties.apply_to
     
@@ -163,8 +187,9 @@ def returnSuffix(node, properties):
 
 # Sets up the node tree based on the structure selected in properties.
 def nTreeSetup(node_tree, textures_dir, material_name, properties):
-    for node in node_tree.nodes:
-        node_tree.nodes.remove(node)
+    if properties.clearNodes:
+        for node in node_tree.nodes:
+            node_tree.nodes.remove(node)
     # Properties
     file_type = properties.image_file_type
     node_structure = properties.node_structure
@@ -230,23 +255,6 @@ def connectNodes(node_tree, output_socket, input_socket):
     new_link = links.new(output_socket, input_socket)
     return new_link
 #add a custom property to objects or materials.   
-def addProperty (selection, customProperty, value, applyMat, applyOBJ):
-    # get the selected objects
-    selection = bpy.context.selected_objects
-
-    # loop through all selected objects
-    if applyMat:
-        for obj in selection:
-            # loop through all materials in the object
-            for mat_slot in obj.material_slots:
-                mat = mat_slot.material
-                # add a custom property named "refractionIOR" with a value of 1.4 to the material
-                mat["refractionIOR"] = 1.4
-    if applyOBJ: 
-            for obj in selection:
-                # add a custom property with the specified name and value to the object
-                obj[customProperty] = value
-
 def assign_unique_ids(node_tree):
     # Create a dictionary to store IDs for nodes and groups
     id_dict = {}
