@@ -1,4 +1,4 @@
-## NodeMaster - Node Tree Automation Addon for Blender
+# NodeMaster - Node Tree Automation Addon for Blender
 
 - Streamline texture loading based on the selected material's name.
 - Automatic Node tree creation with image nodes and custom structures.
