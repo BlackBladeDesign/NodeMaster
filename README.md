@@ -40,9 +40,10 @@ This setting will determine whether image assets are actually loaded or not.
 Using the dropdown, you can select your base node structure to load on Load/Reload. These structures are found in /Props/NodeStructures.
 
 ## Material Settings
-### Deprecated
-### Texture Suffixes
-### To be deprecated
+Deprecated
+
+## Texture Suffixes
+To be deprecated
 ## Tools
 ### Clean Duplicate Materials
 ### Clean Duplicate Images
