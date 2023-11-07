@@ -53,4 +53,5 @@ To be deprecated
 ### Apply Property
 ### Custom Property
 
-## Report Issues: https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/issues
+## Report Issues: 
+https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/issues
