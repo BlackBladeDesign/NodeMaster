@@ -55,3 +55,5 @@ To be deprecated
 
 ## Report Issues: 
 https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/issues
+## Support NodeMaster and other projects
+https://www.paypal.com/donate/?hosted_button_id=X44329R2WEKGS
