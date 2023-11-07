@@ -1,11 +1,12 @@
 ## NodeMaster - Node Tree Automation Addon for Blender
 
-- Streamline texture loading based on selected material's name.
-- Node tree creation (Currently offering two structures, more coming soon)
+- Streamline texture loading based on the selected material's name.
+- Automatic Node tree creation with image nodes and custom structures.
 - Load/Reload function to load textures to corresponding nodes, and reload at any time when updating textures externally.
+- Export node structures in JSON and Import. 
 - Image format definition, helpful for testing multiple image formats, I use this mostly for Substance Painter textures with different levels of compression.
 - GLTF output, use this to connect ambient occlusion. 
-- Suffix definition. If you have exported textures with different suåffixs, "base_Color" instead of "Color", for example, edit the suffix to account for this.
+- Suffix definition. If you have exported textures with different suffixes, "base_Color" instead of "Color", for example, edit the suffix to account for this.
 - Duplicate image and material cleaning tools. 
 
 ![Screenshot 2023-05-17 at 2 55 40 pm](https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/assets/126746830/a475efe8-d9cc-4708-9dfd-d1b26b9e1d1a)
