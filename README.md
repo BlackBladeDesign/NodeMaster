@@ -11,7 +11,7 @@
 ![Screenshot 2023-05-17 at 2 55 40 pm](https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/assets/126746830/a475efe8-d9cc-4708-9dfd-d1b26b9e1d1a)
 
 ## Installation:
-- Download project as a .ZIP file via the green "<> Code" dropdown.
+- Download the project as a .ZIP file via the green "<> Code" dropdown.
 - In Blender, navigate to add-ons via Edit>Preferences>Addons.
 - Click install in the top right of the Preferences addon window, and select the downloaded .ZIP file. 
 - Use the Checkbox once installed to enable or disable the addon. 
@@ -19,7 +19,7 @@
 
 The panel for NodeMaster is found in the Shader Node Editor side panel. Access the side panel with the 'N' Key.
 
-## Load/reload and Set Texture Path**
+## Load/reload and Set Texture Path
 The set texture path button will prompt you to open up your desired texture folder. Since nodemaster loads based on MaterialName+Suffix.format you will want to set the path to the specific texture path for your specific material. For example, if I want to load the set for my "Trim" material, I will set my path to Textures/Trim.
 
 ## Apply To
