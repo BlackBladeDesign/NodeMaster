@@ -19,7 +19,7 @@
 - Find the NodeMaster panel in the Shader Node Editor, under the options panel listed as a new tab.
 
 The panel for NodeMaster is found in the Shader Node Editor side panel. Access the side panel with the 'N' Key.
-
+# Explained:
 ## Load/reload and Set Texture Path
 The set texture path button will prompt you to open up your desired texture folder. Since nodemaster loads based on MaterialName+Suffix.format you will want to set the path to the specific texture path for your specific material. For example, if I want to load the set for my "Trim" material, I will set my path to Textures/Trim.
 
