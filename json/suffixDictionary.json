@@ -1,7 +1,7 @@
 {
     "Normal_Map": ["_Normal_Map", "Non-Color"],
     "NormalMap": ["_NormalMap", "Non-Color"],
-    "Normal Map": ["_Normal_Map", "Non-Color"],
+    "Normal Map": ["_Normal", "Non-Color"],
     "Normals": ["_Normals", "Non-Color"],
     "Normal": ["_Normal", "Non-Color"],
     "Nrm": ["_NRM", "Non-Color"],
