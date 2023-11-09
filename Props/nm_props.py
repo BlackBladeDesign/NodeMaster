@@ -5,7 +5,8 @@ import os
 
 def populate_node_structure_enum_items(self, context):
     script_directory = os.path.dirname(__file__)  # Get the directory where the script is located
-    folder_path = os.path.join(script_directory, "NodeStructures")  # Combine with the subfolder name
+    folder_path = os.path.abspath(os.path.join(script_directory, "../json/NodeStructures"))  # Combine with the subfolder name
+
     items = []
 
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
@@ -33,21 +34,6 @@ class NodeMasterProperties(bpy.types.PropertyGroup):
         name="Load Image assets",
         description="Enabled or disable to load image textures assets. Helpful for if you just want the node structure without images.",
         default=True
-    )
-    gltf_Node : bpy.props.BoolProperty(
-        name="Add glTF Node",
-        description="Create a GLB/GLTF Output node, connect AO or ORM red channel to it for Ambient Occlusion.",
-        default=True
-    )
-    texCoord : bpy.props.BoolProperty(
-        name="Add Texture Coord",
-        description="Add Texture Coordinate node with mapping.",
-        default=False
-    )
-    displacement : bpy.props.BoolProperty(
-        name="Add Displacement",
-        description="Add a Displacement node, connect to material output.",
-        default=False
     )
     image_file_type: bpy.props.EnumProperty(
         name="Image File Type",
