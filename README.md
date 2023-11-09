@@ -43,8 +43,9 @@ Using the dropdown, you can select your base node structure to load on Load/Relo
 Deprecated
 
 ### Texture Suffixes
-To be deprecated
+deprecated
 ### Tools
+
 #### Clean Duplicate Materials
 #### Clean Duplicate Images
 #### Load Node Tree (JSON)
