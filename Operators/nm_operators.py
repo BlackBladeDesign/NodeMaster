@@ -89,6 +89,21 @@ class ExportNodes(bpy.types.Operator, ExportHelper):
         file_path = self.filepath
         export_node_tree(node_tree, file_path)
         return {'FINISHED'}
+class ExportTransforms(bpy.types.Operator, ExportHelper):
+    bl_label = "Export Transforms"
+    bl_idname = "node.exporttransforms"
+    filename_ext = ".json"
+    filter_glob: bpy.props.StringProperty(
+        default="*.json",
+        options={'HIDDEN'},
+        maxlen=255,
+    )
+
+    def execute(self, context):
+
+        file_path = self.filepath
+        exportTransforms(file_path)
+        return {'FINISHED'}
 class AddProperty(Operator):
     bl_label = "Add Custom Property"
     bl_idname = "node.addproperty"
@@ -159,30 +174,24 @@ def errorGen (msg, titleVar, iconVar):
          bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text=message), title=titleVar, icon=iconVar)
 
 #Sets up the node tree based on the structure selected in properties.         
-def returnSuffix(node, properties):
-    # Create a dictionary to map node names to their corresponding values, including color space
-    orm_Suffix = properties.orm_texture if properties.orm_texture != "" else "_ORM"
-    nm_Suffix = properties.normal_map if properties.normal_map != "" else "_Normal"
-    col_Suffix = properties.base_color if properties.base_color != "" else "_Color"
-    met_Suffix = properties.metallic_texture if properties.metallic_texture != "" else "_Metallic"
-    roughness_Suffix = properties.roughness_texture if properties.roughness_texture != "" else "_Roughness"
+import os
+import json
 
-    nodeDataMap = {
-        "Normal Map": (nm_Suffix, 'Non-Color'),  # Suffix, Color Space (None for now)
-        "NormalMap": (nm_Suffix, 'Non-Color'),
-        "ORM": (orm_Suffix, 'Non-Color'),
-        "Base Color": (col_Suffix, 'sRGB'),  # Specify the color space, e.g., "sRGB"
-        "Color": (col_Suffix, 'sRGB'),
-        "Roughness": (roughness_Suffix, 'Non-Color'),
-        "Metallic": (met_Suffix,'Non-Color')
-        # Add more mappings as needed
-    }
+def returnSuffix(node):
+    # Define the path to the JSON file
+    script_directory = os.path.dirname(__file__)
+    json_path = os.path.abspath(os.path.join(script_directory, "../json/suffixDictionary.json"))
 
-    # Use the dictionary to look up the value based on the node name
-    if node in nodeDataMap:
-        return nodeDataMap[node]
+    # Load the suffix dictionary from the JSON file
+    with open(json_path, 'r') as file:
+        suffix_dict = json.load(file)
+
+    # Use the dictionary to look up the value based on the node namea
+    if node in suffix_dict:
+        return suffix_dict[node]
     else:
         # Handle the case where the node name is not found in the dictionary
+        errorGen("Image not found, try checking the suffix or add another in the Suffix JSON: {}".format(node), 'Error', 'FILE_BLANK')
         return ("Unknown", None)  # Default Suffix and Color Space
 
 # Sets up the node tree based on the structure selected in properties.
@@ -196,15 +205,15 @@ def nTreeSetup(node_tree, textures_dir, material_name, properties):
 
     script_directory = os.path.dirname(__file__)
     # Construct the path to the "Props/Nodestructures" directory
-    folder_path = os.path.abspath(os.path.join(script_directory, "../Props/Nodestructures"))
+    folder_path = os.path.abspath(os.path.join(script_directory, "../json/NodeStructures"))
     structureSelected = os.path.join(folder_path, node_structure)
-    import_node_tree(structureSelected)
+    import_node_tree(structureSelected, node_tree)
     for node in node_tree.nodes:
         # Check if the node is a ShaderNodeTexImage
         if isinstance(node, bpy.types.ShaderNodeTexImage):
             node_name = node.name
             # Use the returnSuffix function to get the image name
-            suffix = returnSuffix(node_name, properties)
+            suffix = returnSuffix(node_name)
             if suffix [0] != "Unknown":
                 # Load the image texture based on the image name
                 node.image = loadImageTexture(textures_dir, material_name, suffix[0], file_type, suffix[1])
@@ -366,7 +375,7 @@ def export_node_tree(node_tree, file_path):
         json.dump(data, file, cls=NodeEncoder, ensure_ascii=False, indent=4)
 
     return {'FINISHED'}
-def import_node_tree(file_path):
+def import_node_tree(file_path,node_tree = None):
     with open(file_path, 'r') as file:
         data = json.load(file)
         # Get the active object
@@ -374,10 +383,14 @@ def import_node_tree(file_path):
     # Check if there is an active object and if it has an active material
     if  obj == None or obj and obj.active_material == None:
         errorGen("No Material or Object Selected{}".format("."), 'Error', 'FILE_BLANK')              
-    else:
-        selected_material = obj.active_material
-        node_tree = selected_material.node_tree
-        import_node_tree_internal(node_tree, data)
+    else:  
+        if node_tree:
+            import_node_tree_internal(node_tree, data)
+        else:
+            selected_material = obj.active_material
+            node_tree = selected_material.node_tree
+            import_node_tree_internal(node_tree, data)
+        
 
     # Center the view on the selected nodes
 
@@ -488,6 +501,58 @@ def create_links(node_tree, links_data, node_dict, group_dict):
                 errorGen(f"Error creating link from {from_node_name} to {to_node_name}: {e}", 'Error', 'ERROR')
                 return
     focusOnNodes
+import math
+
+
+def encode_float(obj):
+    if isinstance(obj, float):
+        return round(obj, 8)  # Round to 8 decimal places
+    raise TypeError
+
+def exportTransforms(file_path):
+    selected_objects = bpy.context.selected_objects
+    transforms = []
+
+    # Add persistent data
+    persistent_data = {
+        "id": "UUID2",  # Generate a unique ID
+        "name": "NecklaceTransforms10K",
+        "partnerId": "58e92909-84f7-473e-ba06-37dad644ed2a",  # Your partner ID
+        "transforms": transforms
+    }
+
+    for obj in selected_objects:
+        if obj.type == 'MESH':
+            position = {
+                "x": obj.location.x,
+                "y": obj.location.z,
+                "z": -obj.location.y,
+            }
+            rotation = {
+                "x": math.degrees(-obj.rotation_euler.x),  # Convert radians to degrees
+                "y": math.degrees(obj.rotation_euler.z),    # Convert radians to degrees
+                "z": math.degrees(-obj.rotation_euler.y),  # Convert radians to degrees
+            }
+            scale = {
+                "x": obj.scale.x,
+                "y": obj.scale.z,
+                "z": obj.scale.y,
+            }
+            obj_data = {
+                "id": obj.name,
+                "name": obj.name,
+                "position": position,
+                "rotation": rotation,
+                "scale": scale
+            }
+            transforms.append(obj_data)
+
+    with open(file_path, 'w') as json_file:
+        json.dump(persistent_data, json_file, indent=4, default=encode_float)
+
+    return {'FINISHED'}
+
+
 def focusOnNodes():
     node_tree = bpy.context.space_data.node_tree
     if node_tree:
