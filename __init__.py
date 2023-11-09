@@ -2,7 +2,7 @@ import bpy
 from bpy.props import PointerProperty
 from bpy.props import (EnumProperty, StringProperty, BoolProperty)
 from bpy.types import (Panel,Operator,AddonPreferences,PropertyGroup)
-from .Panel.nm_panel import NodeMasterPanel, texSuffixPanel, fileSettingsPanel, nodeStructurePanel, nmToolsPanel
+from .Panel.nm_panel import NodeMasterPanel, fileSettingsPanel, nodeStructurePanel, nmToolsPanel
 from .Operators.nm_operators import AutoLoad, LoadFromPath, ImportNodes, ExportNodes, AddProperty, ExportTransforms
 from .Props.nm_props import NodeMasterProperties
 from .Operators.nm_matCleanup import matCleanup, imgCleanup
