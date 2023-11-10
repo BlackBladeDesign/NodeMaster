@@ -511,13 +511,17 @@ def encode_float(obj):
 
 def exportTransforms(file_path):
     selected_objects = bpy.context.selected_objects
+
+    # Sort the selected objects by their names
+    selected_objects.sort(key=lambda obj: obj.name)
+
     transforms = []
 
     # Add persistent data
     persistent_data = {
         "id": "UUID2",  # Generate a unique ID
-        "name": "NecklaceTransforms10K",
-        "partnerId": "58e92909-84f7-473e-ba06-37dad644ed2a",  # Your partner ID
+        "name": "-",
+        "partnerId": "-",  # Your partner ID
         "transforms": transforms
     }
 
@@ -551,7 +555,6 @@ def exportTransforms(file_path):
         json.dump(persistent_data, json_file, indent=4, default=encode_float)
 
     return {'FINISHED'}
-
 
 def focusOnNodes():
     node_tree = bpy.context.space_data.node_tree
