@@ -4,6 +4,8 @@ from bpy.types import Operator
 import json
 from json import JSONEncoder
 from bpy_extras.io_utils import ExportHelper, ImportHelper
+import math
+import re
 
 # Without a path set, will load/reload from the .blend files parent folder, and then /textures. Eg if .blend exists in /3D Assets/Blend, it'll search in 3D Assets/Textures/.
 # Otherwise it will just reload from the path specified.
@@ -501,27 +503,30 @@ def create_links(node_tree, links_data, node_dict, group_dict):
                 errorGen(f"Error creating link from {from_node_name} to {to_node_name}: {e}", 'Error', 'ERROR')
                 return
     focusOnNodes
-import math
 
 
-def encode_float(obj):
-    if isinstance(obj, float):
-        return round(obj, 8)  # Round to 8 decimal places
+def extract_numbers(text):
+    # Extract numerical values from a string
+    return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', text)]
+
+def custom_sort(obj):
+    return extract_numbers(obj.name)
+
+def encode_float(o):
+    if isinstance(o, float):
+        return round(o, 6)  # Round floats to 6 decimal places
     raise TypeError
 
 def exportTransforms(file_path):
     selected_objects = bpy.context.selected_objects
 
-    # Sort the selected objects by their names
-    selected_objects.sort(key=lambda obj: obj.name)
+    # Sort the selected objects using the custom_sort function
+    selected_objects.sort(key=custom_sort)
 
     transforms = []
 
     # Add persistent data
     persistent_data = {
-        "id": "UUID2",  # Generate a unique ID
-        "name": "-",
-        "partnerId": "-",  # Your partner ID
         "transforms": transforms
     }
 
@@ -555,6 +560,7 @@ def exportTransforms(file_path):
         json.dump(persistent_data, json_file, indent=4, default=encode_float)
 
     return {'FINISHED'}
+
 
 def focusOnNodes():
     node_tree = bpy.context.space_data.node_tree
