@@ -5,6 +5,7 @@ Donate! (If you want to): https://www.paypal.com/donate/?hosted_button_id=X44329
 - I work full time with GLB models, and creating the same node structures every day hundreds of times has driven me to insanity. It may only take 3-5 minutes to create the nodes and load the textures, but I needed more. 
 - With a single click, you can select your texture folder for your particular model. The selected node structure will then automatically generate for you material(s) and load the corrosponding textures.
 - Check out the node suffix dictionary for naming your textures. I use Substance Painter all day so I set up the default suffixes to match my export settings. Normal, ORM, BaseColor etc.
+- Being someone who consitently imnports multiple models with similar material names, I also added a button to clear duplicated materials. anything named .001, .002 etc. will be cleaned up and the first in line will be added to everything instead. If you have 100 models in your Blend file and their materials are all called "PrintArea".blahblahblah - this is where it's most useful, for cases where many models use the same material name for whatever. Online customization platforms is the best example of this use case. 
 
 Features:
 - Streamline texture loading based on the selected material's name.
