@@ -1,5 +1,5 @@
 # NodeMaster - Node Tree Automation Addon for Blender
-
+Donate! (If you want to): https://www.paypal.com/donate/?hosted_button_id=X44329R2WEKGS
 - Streamline texture loading based on the selected material's name.
 - Automatic Node tree creation with image nodes and custom structures.
 - Load/Reload function to load textures to corresponding nodes, and reload at any time when updating textures externally.
