@@ -1,68 +1,84 @@
 # NodeMaster - Node Tree Automation Addon for Blender
-Donate! (If you want to): https://www.paypal.com/donate/?hosted_button_id=X44329R2WEKGS
 
-### About the Addon:
-- I work full time with GLB models, and creating the same node structures every day hundreds of times has driven me to insanity. It may only take 3-5 minutes to create the nodes and load the textures, but I needed more. 
-- With a single click, you can select your texture folder for your particular model. The selected node structure will then automatically generate for you material(s) and load the corrosponding textures.
-- Check out the node suffix dictionary for naming your textures. I use Substance Painter all day so I set up the default suffixes to match my export settings. Normal, ORM, BaseColor etc.
-- Being someone who consitently imnports multiple models with similar material names, I also added a button to clear duplicated materials. anything named .001, .002 etc. will be cleaned up and the first in line will be added to everything instead. If you have 100 models in your Blend file and their materials are all called "PrintArea".blahblahblah - this is where it's most useful, for cases where many models use the same material name for whatever. Online customization platforms is the best example of this use case. 
+Support NodeMaster and other projects:  
+[Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=X44329R2WEKGS)
 
-Features:
-- Streamline texture loading based on the selected material's name.
-- Automatic Node tree creation with image nodes and custom structures.
-- Load/Reload function to load textures to corresponding nodes, and reload at any time when updating textures externally.
-- Export node structures in JSON and Import. 
-- Image format definition, helpful for testing multiple image formats, I use this mostly for Substance Painter textures with different levels of compression.
-- GLTF output, use this to connect ambient occlusion. 
-- Suffix definition. If you have exported textures with different suffixes, "base_Color" instead of "Color", for example, edit the suffix to account for this.
-- Duplicate image and material cleaning tools. 
+## About the Addon
 
-![Screenshot 2023-05-17 at 2 55 40 pm](https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/assets/126746830/a475efe8-d9cc-4708-9dfd-d1b26b9e1d1a)
+As a full-time GLB modeler, I found myself repeatedly creating the same node structures hundreds of times a day. While it only takes a few minutes to set up the nodes and load the textures, I wanted a faster, more efficient solution. This addon was created to automate that process.
 
-### Installation:
-- Download the project as a .ZIP file via the green "<> Code" dropdown.
-- In Blender, navigate to add-ons via Edit>Preferences>Addons.
-- Click install in the top right of the Preferences addon window, and select the downloaded .ZIP file. 
-- Use the Checkbox once installed to enable or disable the addon. 
-- Find the NodeMaster panel in the Shader Node Editor, under the options panel listed as a new tab.
+With a single click, you can select your texture folder for the model, and NodeMaster will automatically generate the required material(s) and load the corresponding textures.
 
-The panel for NodeMaster is found in the Shader Node Editor side panel. Access the side panel with the 'N' Key.
-## Explained:
-#### Load/reload and Set Texture Path
-The set texture path button will prompt you to open up your desired texture folder. Since nodemaster loads based on MaterialName+Suffix.format you will want to set the path to the specific texture path for your specific material. For example, if I want to load the set for my "Trim" material, I will set my path to Textures/Trim.
+### Key Features:
+- **Streamlined Texture Loading**: Load textures based on the material name automatically.
+- **Node Tree Creation**: Automatically generates a custom node tree with image nodes and custom structures.
+- **Load/Reload Function**: Reload textures into their corresponding nodes and update them when textures are modified externally.
+- **Export and Import Node Structures**: Export and import node structures as JSON files for easy reuse.
+- **Image Format Definition**: Useful for testing multiple image formats, especially for textures from tools like Substance Painter with different compression levels.
+- **GLTF Output**: Supports ambient occlusion for GLTF exports.
+- **Suffix Definition**: Adjust suffix definitions to match your texture naming conventions (e.g., "base_Color" instead of "Color").
+- **Duplicate Material/Image Cleaning**: Automatically clean up duplicate materials and images (e.g., materials named ".001", ".002", etc.).
 
-### Apply To
-The Apply To setting will determine what materials will load their textures. Whether it loads only the selected material, every material attached to the object, or if it loads texture for every material of every object that is visible in the scene. This is ideal if you have one folder for all textures and materials rather than nested folders for each material. Eg. /Textures/ instead of /Textures/Material1 etc.
+![Screenshot](https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/assets/126746830/a475efe8-d9cc-4708-9dfd-d1b26b9e1d1a)
+
+## Installation
+
+1. Download the project as a .ZIP file via the green "<> Code" dropdown on GitHub.
+2. In Blender, go to `Edit > Preferences > Add-ons`.
+3. Click `Install` in the top-right of the Add-ons window and select the downloaded `.ZIP` file.
+4. Enable or disable the addon by checking the box next to it.
+5. Once enabled, the NodeMaster panel will appear in the Shader Node Editor under a new tab.
+
+To access the panel, press the **'N'** key to open the side panel in the Shader Node Editor.
+
+## How to Use
+
+### Load/Reload and Set Texture Path
+
+- The **Set Texture Path** button prompts you to select the texture folder for your model.
+- NodeMaster loads textures based on the pattern `MaterialName+Suffix.format`, so ensure the path matches the folder for your specific material (e.g., for a "Trim" material, the path might be `Textures/Trim`).
+
+### Apply To Setting
+
+- **Apply To** determines which materials have their textures loaded. You can choose:
+  - Only the selected material
+  - All materials attached to the active object
+  - All materials in the scene (ideal for shared texture folders across multiple materials).
 
 ### Node Structure Settings
-#### Load Image Nodes
-This setting will determine whether image texture nodes are created at all.
 
-#### Clear All Nodes
-This setting will clear the entire node tree prior to loading - ideal for a clean node structure.
-
-#### Load Image Assets
-This setting will determine whether image assets are actually loaded or not.
+- **Load Image Nodes**: Enable or disable the creation of image texture nodes in the node tree.
+- **Clear All Nodes**: Clears the existing node tree, ensuring a clean slate before loading the new structure.
+- **Load Image Assets**: Determines whether image assets are actually loaded into the material or just the nodes.
 
 ### Node Structure
-Using the dropdown, you can select your base node structure to load on Load/Reload. These structures are found in /Props/NodeStructures.
+
+- Select your base node structure from the dropdown. These node structures are located in `/Props/NodeStructures`.
 
 ### Material Settings
-Deprecated
+
+- This section is deprecated and is no longer in use.
 
 ### Texture Suffixes
-deprecated
+
+- This feature is deprecated and no longer in use.
+
 ### Tools
 
-#### Clean Duplicate Materials
-#### Clean Duplicate Images
-#### Load Node Tree (JSON)
-#### Export Node Tree (Json)
-#### Add Custom Property
-#### Apply Property
-#### Custom Property
+- **Clean Duplicate Materials**: Removes duplicate materials (e.g., materials named ".001", ".002", etc.) and consolidates them into the first occurrence.
+- **Clean Duplicate Images**: Removes duplicate image textures.
+- **Load Node Tree (JSON)**: Load a previously exported node tree from a JSON file.
+- **Export Node Tree (JSON)**: Export the current node tree structure as a JSON file for future use.
+- **Add Custom Property**: Add custom properties to your node tree.
+- **Apply Property**: Apply custom properties to nodes in the tree.
+- **Custom Property**: Manage and assign custom properties to your materials or nodes.
 
-## Report Issues: 
-https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/issues
-## Support NodeMaster and other projects
-https://www.paypal.com/donate/?hosted_button_id=X44329R2WEKGS
+## Report Issues
+
+If you encounter any issues or bugs, please report them here:  
+[NodeMaster Issues](https://github.com/BlackBladeDesign/NodeMaster---Blender-node-tree-automation-addon/issues)
+
+## Support NodeMaster and Other Projects
+
+If you find this addon helpful, consider supporting its development:  
+[Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=X44329R2WEKGS)
