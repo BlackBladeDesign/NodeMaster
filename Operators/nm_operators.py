@@ -494,7 +494,11 @@ def create_links(node_tree, links_data, node_dict, group_dict):
                 to_node = to_node.nodes[to_socket_index]
 
             from_socket = from_node.outputs[from_socket_index]
-            to_socket = to_node.inputs[to_socket_index]
+            if to_socket_index < len(to_node.inputs):
+                to_socket = to_node.inputs[to_socket_index]
+            else:
+                errorGen(f"IndexError: to_socket_index {to_socket_index} out of range for node {to_node_name}", 'Error', 'ERROR')
+                continue
 
             # Create a link between nodes
             try:
