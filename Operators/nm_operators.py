@@ -198,6 +198,9 @@ def returnSuffix(node):
 
 # Sets up the node tree based on the structure selected in properties.
 def nTreeSetup(node_tree, textures_dir, material_name, properties):
+    if not isinstance(node_tree, bpy.types.NodeTree):
+        errorGen("Invalid node tree provided", 'Error', 'FILE_BLANK')
+        return
     if properties.clearNodes:
         for node in node_tree.nodes:
             node_tree.nodes.remove(node)
@@ -290,6 +293,8 @@ def export_node_tree(node_tree, file_path):
 
         node_dict = {}
         for node in node_tree.nodes:
+            print(f"Processing node: {node.name}, Type: {type(node).__name__}")
+
             node_data = {
                 'name': node.name,
                 'label': node.label,
@@ -299,44 +304,54 @@ def export_node_tree(node_tree, file_path):
                 'outputs': []
             }
 
+            # Handle ShaderNodeTexImage (image texture node)
             if isinstance(node, bpy.types.ShaderNodeTexImage) and node.image is not None:
                 node_data['color_space'] = node.image.colorspace_settings.name
 
-            if node.type == 'GROUP':
-                # Handle group inputs and outputs separately
-                node_data['name'] = node.node_tree.name
+            # Handle ShaderNodeGroup (group node)
+            if isinstance(node, bpy.types.ShaderNodeGroup):
+                print(f"Found a ShaderNodeGroup: {node.name}")
 
-                for input_idx, input_socket in enumerate(node.inputs):
-                    input_name = input_socket.name
-                    input_type = input_socket.bl_idname
+                # Check if the node has a node tree and interface
+                if node.node_tree:
+                    interface = node.node_tree.interface
 
-                    input_value = None  # Default value for input value
+                    # Make sure the interface exists
+                    if interface:
+                        # Iterate through the items in the interface
+                        for item in interface.items_tree:
+                            # Only process items that are sockets
+                            if isinstance(item, bpy.types.NodeTreeInterfaceSocket):
+                                in_out = item.in_out
+                                socket_name = item.name
+                                socket_type = item.socket_type
 
-                    if hasattr(input_socket, 'default_value'):
-                        if isinstance(input_socket.default_value, float):
-                            input_value = str(input_socket.default_value)
-                        elif input_socket.bl_idname == 'NodeSocketColor':
-                            input_value = ', '.join(map(str, input_socket.default_value))
-                        else:
-                            input_value = ', '.join(map(str, input_socket.default_value))
+                                # Process input and output sockets
+                                if in_out == 'INPUT':
+                                    node_data['inputs'].append({
+                                        "name": socket_name,
+                                        "type": socket_type,
+                                        "in_out": in_out
+                                    })
+                                else:
+                                    node_data['outputs'].append({
+                                        "name": socket_name,
+                                        "type": socket_type,
+                                        "in_out": in_out
+                                    })
 
-                    node_data['inputs'].append((input_idx, input_name, input_type, input_value))
+                    # Recursively export nodes inside the group node
+                    node_data['nodes'] = export_node_tree_internal(node.node_tree, id_dict)
+                else:
+                    print(f"Group node {node.name} does not have a node tree!")
 
-                for output_idx, output_socket in enumerate (node.outputs):
-                    output_name = output_socket.name
-                    output_type = output_socket.bl_idname
-                    node_data['outputs'].append((output_idx, output_name, output_type))
-
-                # Recursively export nodes inside the group
-                node_data['nodes'] = export_node_tree_internal(node.node_tree, id_dict)
             else:
-                # Regular node inputs and outputs
+                # Regular node: Process inputs and outputs
                 for input_idx, input_socket in enumerate(node.inputs):
                     input_name = input_socket.name
                     input_type = input_socket.bl_idname
 
                     input_value = None  # Default value for input value
-
                     if hasattr(input_socket, 'default_value'):
                         if isinstance(input_socket.default_value, float):
                             input_value = str(input_socket.default_value)
@@ -355,6 +370,7 @@ def export_node_tree(node_tree, file_path):
             data['nodes'].append(node_data)
             node_dict[node.name] = node
 
+        # Export links between nodes
         for link in node_tree.links:
             from_node = link.from_node
             from_socket = link.from_socket
@@ -369,6 +385,7 @@ def export_node_tree(node_tree, file_path):
             data['links'].append((from_name, from_socket_idx, to_name, to_socket_idx))
 
         return data
+
 
     id_dict = assign_unique_ids(node_tree)
     data = export_node_tree_internal(node_tree, id_dict)
@@ -425,25 +442,33 @@ def import_node_tree_internal(node_tree, data):
                     group_inputs = node_data['inputs']
                     group_outputs = node_data['outputs']
 
+                    # Create a new node group
                     newGroup = bpy.data.node_groups.new(name=node_name, type='ShaderNodeTree')
                     group_dict[node_name] = newGroup  # Store the group for linking
 
-                    # Create group inputs
-                    for input_idx, input_data in enumerate(group_inputs):
-                        input_name = input_data[1]
-                        input_socket_type = input_data[2]
+                    # Ensure the interface is initialized for the group
+                    if not hasattr(newGroup, 'interface'):
+                        errorGen(f"Group {node_name} has no interface property.", 'Error', 'ERROR')
+                        return
+
+                    # Add input sockets using the group interface
+                    for input_data in group_inputs:
+                        input_name = input_data["name"]
+                        input_socket_type = input_data["type"]
                         try:
-                            new_input = newGroup.inputs.new(input_socket_type, input_name)
+                            # Create the input socket for the group using interface
+                            newGroup.interface.new_socket(input_name, socket_type=input_socket_type, in_out='INPUT')
                         except RuntimeError as e:
                             errorGen(f"Error creating input socket for {input_name} in group {node_name}: {e}", 'Error', 'ERROR')
                             return
 
-                    # Create group outputs (if needed)
-                    for output_idx, output_data in enumerate(group_outputs):
-                        output_name = output_data[1]
-                        output_socket_type = output_data[2]
+                    # Add output sockets using the group interface
+                    for output_data in group_outputs:
+                        output_name = output_data["name"]
+                        output_socket_type = output_data["type"]
                         try:
-                            new_output = newGroup.outputs.new(output_socket_type, output_name)
+                            # Create the output socket for the group using interface
+                            newGroup.interface.new_socket(output_name, socket_type=output_socket_type, in_out='OUTPUT')
                         except RuntimeError as e:
                             errorGen(f"Error creating output socket for {output_name} in group {node_name}: {e}", 'Error', 'ERROR')
                             return
@@ -451,7 +476,7 @@ def import_node_tree_internal(node_tree, data):
                     # Recursively import nodes within the group
                     import_node_tree_internal(newGroup, groupNodes)
 
-            # Now, create the node
+            # Now, create the node in the node tree
             if node_type == 'ShaderNodeGroup':
                 node = node_tree.nodes.new('ShaderNodeGroup')
                 node.node_tree = group_dict[node_name]  # Use the stored group
@@ -463,11 +488,9 @@ def import_node_tree_internal(node_tree, data):
                         if node.image:
                             node.image.colorspace_settings.name = color_space
 
-
             node.location = node_location
             node.name = node_name
             node.label = node_label
-
 
         node_dict[node_name] = node
 
@@ -475,6 +498,8 @@ def import_node_tree_internal(node_tree, data):
     create_links(node_tree, data['links'], node_dict, group_dict)
     
     return {'FINISHED'}
+
+
 
 def create_links(node_tree, links_data, node_dict, group_dict):
     for link_data in links_data:

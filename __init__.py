@@ -92,7 +92,7 @@ classes = [
     nmToolsPanel,
     matCleanup,
     imgCleanup,
-    OpenPayPalDonateLink,
+    OpenPayPalDonateLink
 ]
 
 
