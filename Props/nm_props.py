@@ -18,6 +18,11 @@ def populate_node_structure_enum_items(self, context):
 
     return items
 
+def update_node_structure_enum(self, context):
+    self['node_structure'] = populate_node_structure_enum_items(self, context)
+
+bpy.app.handlers.depsgraph_update_post.append(update_node_structure_enum)
+
 class NodeMasterProperties(bpy.types.PropertyGroup):
 
     loadImageNodes : bpy.props.BoolProperty(

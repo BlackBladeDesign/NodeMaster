@@ -86,6 +86,14 @@ class ExportNodes(bpy.types.Operator, ExportHelper):
         maxlen=255,
     )
 
+    def invoke(self, context, event):
+        # Set the default directory to the addon folder
+        script_directory = os.path.dirname(__file__)
+        default_directory = os.path.abspath(os.path.join(script_directory, "../json/nodestructures"))
+        self.filepath = os.path.join(default_directory, "nodestructure.json")
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
     def execute(self, context):
         node_tree = context.active_object.active_material.node_tree
         file_path = self.filepath
