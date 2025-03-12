@@ -61,7 +61,7 @@ To access the panel, press the **'N'** key to open the side panel in the Shader 
 
 ### Texture Suffixes
 
-- This feature is deprecated and no longer in use.
+- This feature is deprecated and no longer in use. Refer instead to the SuffixDictionary in Json/SuffixDictionary.JSON
 
 ### Tools
 
