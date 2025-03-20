@@ -7,7 +7,9 @@ Support NodeMaster and other projects:
 
 As a full-time GLB modeler, I found myself repeatedly creating the same node structures hundreds of times a day. While it only takes a few minutes to set up the nodes and load the textures, I wanted a faster, more efficient solution. This addon was created to automate that process.
 
-With a single click, you can select your texture folder for the model, and NodeMaster will automatically generate the required material(s) and load the corresponding textures.
+With a single click, you can select your texture folder for the model, and NodeMaster will automatically generate the required Node(s) and load the corresponding textures for each.
+
+A few times I used this in conjunction with the "Batch Exporter GLB/GLTF" addon too in cases where I needed to export 30+ models from the same collection all with the same material/material name to .GLB, but load the textures specifically for each on export. Saved even more time! 
 
 ### Key Features:
 - **Streamlined Texture Loading**: Load textures based on the material name automatically.
