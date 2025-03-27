@@ -254,9 +254,15 @@ def createNode(node_tree, node_type, node_name, x, y):
         return new_node
 
 def loadImageTexture(texDir, material, suffix, filetype, colorSpace):
-     if bpy.context.scene.nm_props.loadTextures:
+    if bpy.context.scene.nm_props.loadTextures:
         newPath = os.path.join(texDir, (material + suffix + filetype))
         if os.path.exists(newPath):
+            # Remove the old image if it exists
+            existing_image = bpy.data.images.get(material + suffix + filetype)
+            if existing_image:
+                bpy.data.images.remove(existing_image, do_unlink=True)
+            
+            # Load the new image
             image = bpy.data.images.load(newPath)
             if colorSpace is not None:
                 image.colorspace_settings.name = colorSpace
@@ -264,7 +270,7 @@ def loadImageTexture(texDir, material, suffix, filetype, colorSpace):
             return image
         else:
             errorGen("Missing Textures: {}".format(newPath), 'Error', 'FILE_BLANK')
-     else:
+    else:
         return
 
 def connectNodes(node_tree, output_socket, input_socket):
