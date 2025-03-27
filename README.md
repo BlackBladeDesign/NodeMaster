@@ -11,6 +11,8 @@ With a single click, you can select your texture folder for the model, and NodeM
 
 A few times I used this in conjunction with the "Batch Exporter GLB/GLTF" addon too in cases where I needed to export 30+ models from the same collection all with the same material/material name to .GLB, but load the textures specifically for each on export. Saved even more time! 
 
+![Mar-27-2025 10-58-24](https://github.com/user-attachments/assets/031cede4-34b3-41f6-920a-6a69605a29c0)
+
 ### Key Features:
 - **Streamlined Texture Loading**: Load textures based on the material name automatically.
 - **Node Tree Creation**: Automatically generates a custom node tree with image nodes and custom structures.
