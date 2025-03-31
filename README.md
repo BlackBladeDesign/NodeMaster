@@ -27,7 +27,7 @@ A few times I used this in conjunction with the "Batch Exporter GLB/GLTF" addon 
 
 ## Installation
 
-1. Download the project as a .ZIP file via the green "<> Code" dropdown on GitHub.
+1. Download the project as a .ZIP file via the green "<> Code" dropdown on GitHub. RENAME THE .ZIP to NodeMaster
 2. In Blender, go to `Edit > Preferences > Add-ons`.
 3. Click `Install` in the top-right of the Add-ons window and select the downloaded `.ZIP` file.
 4. Enable or disable the addon by checking the box next to it.
