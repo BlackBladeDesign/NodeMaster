@@ -1,4 +1,4 @@
-# NodeMaster - Node Tree Automation Addon for Blender
+# Blender 4.40 - NodeMaster - Node Tree Automation Addon for Blender
 
 Support NodeMaster and other projects:  
 [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=X44329R2WEKGS)
