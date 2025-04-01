@@ -18,7 +18,7 @@ A few times I used this in conjunction with the "Batch Exporter GLB/GLTF" addon 
 - **Node Tree Creation**: Automatically generates a custom node tree with image nodes and custom structures.
 - **Load/Reload Function**: Reload textures into their corresponding nodes and update them when textures are modified externally.
 - **Export and Import Node Structures**: Export and import node structures as JSON files for easy reuse.
-- **Image Format Definition**: Useful for testing multiple image formats, especially for textures from tools like Substance Painter with different compression levels.
+- **Image Format Definition**: Useful for testing multiple image formats, especially for textures from tools like Substance Painter with different compression levels. Planning on making this automatic.
 - **GLTF Output**: Supports ambient occlusion for GLTF exports.
 - **Suffix Definition**: Adjust suffix definitions to match your texture naming conventions (e.g., "base_Color" instead of "Color").
 - **Duplicate Material/Image Cleaning**: Automatically clean up duplicate materials and images (e.g., materials named ".001", ".002", etc.).
