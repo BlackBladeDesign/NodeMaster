@@ -5,7 +5,7 @@ Support NodeMaster and other projects:
 
 ## About the Addon
 
-As a full-time 3D artist specializing in the GLB format, I found myself repeatedly creating the same node structures hundreds of times a week. While it only takes a few minutes to set up the nodes and load the textures, I wanted a faster, more efficient solution. This addon was created to automate that process.
+As a full-time 3D artist specializing in the GLB format, I found myself repeatedly creating the same node structures or changing textures hundreds of times a week, especially when tweaking materials and textures before being happy with the final look, and while it only takes a few minutes to set up the nodes and load the textures, I wanted a faster, more efficient solution. This addon was created to automate that process.
 
 With a single click, you can select your texture folder for the model, and NodeMaster will automatically generate the required Node(s) and load the corresponding textures for each.
 
