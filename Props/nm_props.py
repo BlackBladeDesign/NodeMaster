@@ -44,7 +44,8 @@ class NodeMasterProperties(bpy.types.PropertyGroup):
         name="Image File Type",
         description="Select the image file type.",
         items=(
-            (".jpg", "JPEG", ""),
+            (".jpg", "JPG", ""),
+            (".jpeg", "JPEG", ""),
             (".png", "PNG", ""),
             (".bmp", "BMP", ""),
             (".tga", "Targa", "")
